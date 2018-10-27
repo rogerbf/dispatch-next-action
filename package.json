@@ -1,0 +1,45 @@
+{
+  "name": "dispatch-next-action",
+  "version": "1.0.0",
+  "description": "combine middleware",
+  "main": "build/dispatch-next-action.js",
+  "unpkg": "build/dispatch-next-action.umd.js",
+  "module": "build/dispatch-next-action.es.js",
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "clean": "rimraf build coverage .cache dist",
+    "prepare": "npm run clean && npm test",
+    "pretest": "npm run build",
+    "test": "jest",
+    "test:watch": "npm test -- --watch",
+    "test:coverage": "npm test -- --coverage",
+    "test:development": "NODE_ENV=development jest",
+    "test:watch:development": "npm run test:development -- --watch",
+    "test:coverage:development": "npm run test:development -- --coverage"
+  },
+  "keywords": [],
+  "author": "rogerbf <roger@bergfa.lk> (http://bergfa.lk/)",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "7.1.2",
+    "@babel/plugin-external-helpers": "7.0.0",
+    "@babel/plugin-proposal-object-rest-spread": "7.0.0",
+    "@babel/plugin-syntax-object-rest-spread": "7.0.0",
+    "@babel/plugin-transform-modules-commonjs": "7.1.0",
+    "@babel/preset-env": "7.1.0",
+    "babel-core": "7.0.0-bridge.0",
+    "babel-jest": "23.6.0",
+    "eslint": "5.8.0",
+    "jest": "23.6.0",
+    "rimraf": "2.6.2",
+    "rollup": "0.66.6",
+    "rollup-plugin-babel": "4.0.3",
+    "rollup-plugin-commonjs": "9.2.0",
+    "rollup-plugin-node-resolve": "3.4.0",
+    "rollup-plugin-replace": "2.1.0",
+    "rollup-plugin-terser": "3.0.0"
+  }
+}
