@@ -1,4 +1,4 @@
-import { combineMiddleware, dynamicMiddleware } from "../"
+import { combineMiddleware, dynamicMiddleware, bridge } from "../"
 
 describe(`combineMiddleware`, () => {
   test(`example: state middleware`, () => {
@@ -70,10 +70,16 @@ describe(`combineMiddleware`, () => {
 })
 
 describe(`dynamicMiddleware`, () => {
-  test(`example: state middleware`, () => {
-    const state = {}
+  test(`terminates without middleware`, () => {
+    const { dispatch } = dynamicMiddleware()
 
-    const middleware = (dispatch, { state }) => next => (action, ...args) => {
+    expect(dispatch(1, 2, 3)).toEqual([ 1, 2, 3 ])
+  })
+
+  test(`example: state middleware`, () => {
+    let state = {}
+
+    const middleware = dispatch => next => (action, ...args) => {
       if (action.type === `GET`) {
         return state
       } else if (action.type === `SET`) {
@@ -84,7 +90,7 @@ describe(`dynamicMiddleware`, () => {
       }
     }
 
-    const { dispatch } = dynamicMiddleware({ state }, middleware)
+    const { dispatch } = dynamicMiddleware(middleware)
 
     expect(dispatch({ type: `GET` })).toEqual(state)
     expect(dispatch({ type: `SET`, payload: { testing: [ 1, 2 ] } })).toEqual({
@@ -160,5 +166,13 @@ describe(`dynamicMiddleware`, () => {
     clear()
 
     expect(get()).toEqual([])
+  })
+})
+
+describe(`bridge`, () => {
+  test(`bridging dispatchers`, () => {
+    const dispatch = combineMiddleware(bridge(combineMiddleware()))
+
+    expect(dispatch(1, 2, 3)).toEqual([ 1, 2, 3 ])
   })
 })
