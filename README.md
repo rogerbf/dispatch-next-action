@@ -34,6 +34,17 @@ middleware.set(logger)
 middleware.dispatch(1, 2, 3)
 ```
 
+### `bridge`
+
+```javascript
+import { combineMiddleware, dynamicMiddleware, bridge } from "dispatch-next-action"
+
+const dynamic = dynamicMiddleware()
+const dispatch = combineMiddleware(bridge(dynamic.dispatch))
+
+dispatch(1, 2, 3) // [ 1, 2, 3 ]
+```
+
 ## benchmarks
 
 ```
