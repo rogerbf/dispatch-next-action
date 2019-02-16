@@ -1,12 +1,10 @@
 const terminate = (...args) => args
 
-const dynamicMiddleware = (options = {}, ...middleware) => {
-  if (typeof options === `function`) {
-    middleware.unshift(options)
-    options = undefined
+const dynamicMiddleware = (context = {}, ...middleware) => {
+  if (typeof context === `function`) {
+    middleware.unshift(context)
+    context = undefined
   }
-
-  const api = {}
 
   const dispatch = (...args) =>
     ((middleware[0] || {}).actionConsumer || terminate)(...args)
@@ -14,12 +12,12 @@ const dynamicMiddleware = (options = {}, ...middleware) => {
   const clear = () => {
     middleware = []
 
-    return api
+    return dispatch
   }
 
-  const set = (...args) => {
+  const add = (...args) => {
     args.forEach(dispatchConsumer => {
-      const nextConsumer = dispatchConsumer(dispatch, options)
+      const nextConsumer = dispatchConsumer(dispatch, context)
 
       const length = middleware.length
 
@@ -34,7 +32,7 @@ const dynamicMiddleware = (options = {}, ...middleware) => {
       })
     })
 
-    return api
+    return dispatch
   }
 
   const _delete = (...args) => {
@@ -42,26 +40,28 @@ const dynamicMiddleware = (options = {}, ...middleware) => {
       .map(({ dispatchConsumer }) => dispatchConsumer)
       .filter(dispatchConsumer => args.indexOf(dispatchConsumer) === -1)
 
-    return clear().set(...filteredMiddleware)
+    return clear().add(...filteredMiddleware)
   }
-
-  const get = () => middleware.map(({ dispatchConsumer }) => dispatchConsumer)
 
   if (middleware.length) {
     const initialMiddleware = [ ...middleware ]
     middleware = []
-    set(...initialMiddleware)
+    add(...initialMiddleware)
   }
 
-  Object.assign(api, {
-    dispatch,
+  Object.assign(dispatch, {
     clear,
-    set,
+    add,
     delete: _delete,
-    get,
   })
 
-  return api
+  Object.defineProperty(dispatch, `entries`, {
+    get() {
+      return middleware.map(({ dispatchConsumer }) => dispatchConsumer)
+    },
+  })
+
+  return dispatch
 }
 
 export default dynamicMiddleware

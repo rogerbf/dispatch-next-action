@@ -6,138 +6,135 @@ describe(`dynamicMiddleware`, () => {
   })
 
   it(`returns the expected api`, () => {
-    const { dispatch, set, delete: _delete, get } = dynamicMiddleware()
+    const dispatch = dynamicMiddleware()
 
-    expect(typeof set).toBe(`function`)
-    expect(typeof _delete).toBe(`function`)
-    expect(typeof get).toBe(`function`)
+    expect(typeof dispatch.add).toBe(`function`)
+    expect(typeof dispatch.delete).toBe(`function`)
+    expect(dispatch.entries).toEqual([])
     expect(typeof dispatch).toBe(`function`)
   })
 
   test(`dispatch('testing')`, () => {
-    expect(dynamicMiddleware().dispatch(`testing`)).toEqual([ `testing` ])
+    expect(dynamicMiddleware()(`testing`)).toEqual([ `testing` ])
   })
 
-  test(`middleware with options`, () => {
-    const options = {}
-    const middleware = jest.fn((dispatch, options) => next => action => {})
+  test(`middleware with context`, () => {
+    const context = {}
+    const middleware = jest.fn((dispatch, context) => next => action => {})
 
-    dynamicMiddleware(options, middleware)
+    dynamicMiddleware(context, middleware)
 
-    expect(middleware).toHaveBeenCalledWith(expect.any(Function), options)
+    expect(middleware).toHaveBeenCalledWith(expect.any(Function), context)
   })
 
   test(`dispatch(1, 2, 3)`, () => {
     const middleware = jest.fn(dispatch => next => (...args) => next(...args))
 
-    const { dispatch } = dynamicMiddleware(middleware)
+    const dispatch = dynamicMiddleware(middleware)
 
     expect(dispatch(1, 2, 3)).toEqual([ 1, 2, 3 ])
   })
 
   test(`adding/removing middleware`, () => {
-    const { dispatch, set, delete: _delete } = dynamicMiddleware()
+    const dispatch = dynamicMiddleware()
 
     expect(dispatch).toEqual(expect.any(Function))
-    expect(set).toEqual(expect.any(Function))
-    expect(_delete).toEqual(expect.any(Function))
+    expect(dispatch.add).toEqual(expect.any(Function))
+    expect(dispatch.delete).toEqual(expect.any(Function))
 
-    const middleware = jest.fn((dispatch, options) => next => action =>
+    const middleware = jest.fn((dispatch, context) => next => action =>
       next(`testing`)
     )
 
-    set(middleware)
+    dispatch.add(middleware)
 
     expect(dispatch()).toEqual([ `testing` ])
 
-    _delete(middleware)
+    dispatch.delete(middleware)
 
     expect(dispatch({})).toEqual([ {} ])
   })
 
   test(`adding/removing middleware (multiple)`, () => {
     const middleware = {
-      a: jest.fn((dispatch, options) => next => (...args) =>
+      a: jest.fn((dispatch, context) => next => (...args) =>
         next(...args, `a`)
       ),
-      b: jest.fn((dispatch, options) => next => (...args) =>
+      b: jest.fn((dispatch, context) => next => (...args) =>
         next(...args, `b`)
       ),
     }
 
-    const { dispatch, set, delete: _delete } = dynamicMiddleware(
-      middleware.a,
-      middleware.b
-    )
+    const dispatch = dynamicMiddleware(middleware.a, middleware.b)
 
     expect(dispatch).toEqual(expect.any(Function))
-    expect(set).toEqual(expect.any(Function))
-    expect(_delete).toEqual(expect.any(Function))
+    expect(dispatch.add).toEqual(expect.any(Function))
+    expect(dispatch.delete).toEqual(expect.any(Function))
 
     expect(dispatch()).toEqual([ `a`, `b` ])
 
-    _delete(middleware.a)
+    dispatch.delete(middleware.a)
 
     expect(dispatch()).toEqual([ `b` ])
 
-    _delete(middleware.b)
+    dispatch.delete(middleware.b)
 
     expect(dispatch()).toEqual([])
 
-    set(middleware.a)
+    dispatch.add(middleware.a)
 
     expect(dispatch()).toEqual([ `a` ])
 
-    _delete(middleware.a)
+    dispatch.delete(middleware.a)
 
-    set(middleware.b).set(middleware.a)
+    dispatch.add(middleware.b).add(middleware.a)
 
     expect(dispatch()).toEqual([ `b`, `a` ])
   })
 
-  test(`get()`, () => {
-    const middleware = jest.fn((dispatch, options) => next => (...args) =>
+  test(`entries`, () => {
+    const middleware = jest.fn((dispatch, context) => next => (...args) =>
       next(...args, `a`)
     )
 
-    const { get } = dynamicMiddleware(middleware)
+    const dispatch = dynamicMiddleware(middleware)
 
-    expect(get()).toEqual([ middleware ])
+    expect(dispatch.entries).toEqual([ middleware ])
   })
 
   test(`clear()`, () => {
     const middleware = {
-      a: jest.fn((dispatch, options) => next => (...args) =>
+      a: jest.fn((dispatch, context) => next => (...args) =>
         next(...args, `a`)
       ),
-      b: jest.fn((dispatch, options) => next => (...args) =>
+      b: jest.fn((dispatch, context) => next => (...args) =>
         next(...args, `b`)
       ),
     }
 
-    const { clear, get } = dynamicMiddleware(middleware.a, middleware.b)
+    const dispatch = dynamicMiddleware(middleware.a, middleware.b)
 
-    expect(get()).toEqual([ middleware.a, middleware.b ])
+    expect(dispatch.entries).toEqual([ middleware.a, middleware.b ])
 
-    clear()
+    dispatch.clear()
 
-    expect(get()).toEqual([])
+    expect(dispatch.entries).toEqual([])
   })
 
   test(`delete`, () => {
-    const middleware = jest.fn((dispatch, options) => next => (...args) =>
+    const middleware = jest.fn((dispatch, context) => next => (...args) =>
       next(...args, `a`)
     )
 
-    const api = dynamicMiddleware(middleware)
+    const dispatch = dynamicMiddleware(middleware)
 
-    expect(api.delete(middleware)).toEqual(api)
-    expect(api.get()).toEqual([])
+    expect(dispatch.delete(middleware)).toEqual(dispatch)
+    expect(dispatch.entries).toEqual([])
 
-    api.set(middleware)
+    dispatch.add(middleware)
 
-    api.delete(() => {})
+    dispatch.delete(() => {})
 
-    expect(api.get()).toEqual([ middleware ])
+    expect(dispatch.entries).toEqual([ middleware ])
   })
 })
