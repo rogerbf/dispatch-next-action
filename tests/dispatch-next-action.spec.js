@@ -1,6 +1,10 @@
-import { combineMiddleware, dynamicMiddleware, bridge } from "../"
+import {
+  staticMiddleware,
+  dynamicMiddleware,
+  bridge,
+} from "../build/dispatch-next-action"
 
-describe(`combineMiddleware`, () => {
+describe(`staticMiddleware`, () => {
   test(`example: state middleware`, () => {
     const state = {}
 
@@ -15,7 +19,7 @@ describe(`combineMiddleware`, () => {
       }
     }
 
-    const dispatch = combineMiddleware({ state }, middleware)
+    const dispatch = staticMiddleware({ state }, middleware)
 
     expect(dispatch({ type: `GET` })).toEqual(state)
     expect(dispatch({ type: `SET`, payload: { testing: [ 1, 2 ] } })).toEqual({
@@ -58,7 +62,7 @@ describe(`combineMiddleware`, () => {
       },
     }
 
-    const dispatch = combineMiddleware(options, middleware)
+    const dispatch = staticMiddleware(options, middleware)
 
     expect(dispatch({ type: `GET` })).toEqual(get())
     expect(dispatch({ type: `SET`, payload: { testing: [ 1, 2 ] } })).toEqual(
@@ -71,7 +75,7 @@ describe(`combineMiddleware`, () => {
 
 describe(`dynamicMiddleware`, () => {
   test(`terminates without middleware`, () => {
-    const { dispatch } = dynamicMiddleware()
+    const dispatch = dynamicMiddleware()
 
     expect(dispatch(1, 2, 3)).toEqual([ 1, 2, 3 ])
   })
@@ -90,7 +94,7 @@ describe(`dynamicMiddleware`, () => {
       }
     }
 
-    const { dispatch } = dynamicMiddleware(middleware)
+    const dispatch = dynamicMiddleware(middleware)
 
     expect(dispatch({ type: `GET` })).toEqual(state)
     expect(dispatch({ type: `SET`, payload: { testing: [ 1, 2 ] } })).toEqual({
@@ -133,7 +137,7 @@ describe(`dynamicMiddleware`, () => {
       },
     }
 
-    const { dispatch } = dynamicMiddleware(options, middleware)
+    const dispatch = dynamicMiddleware(options, middleware)
 
     expect(dispatch({ type: `GET` })).toEqual(get())
     expect(dispatch({ type: `SET`, payload: { testing: [ 1, 2 ] } })).toEqual(
@@ -147,31 +151,31 @@ describe(`dynamicMiddleware`, () => {
     const a = jest.fn(() => next => action => next(action))
     const b = jest.fn(() => next => action => next(action))
 
-    const { get, set, delete: _delete, clear } = dynamicMiddleware()
+    const dispatch = dynamicMiddleware()
 
-    expect(get()).toEqual([])
+    expect(dispatch.entries).toEqual([])
 
-    set(a)
+    dispatch.add(a)
 
-    expect(get()).toEqual([ a ])
+    expect(dispatch.entries).toEqual([ a ])
 
-    set(b)
+    dispatch.add(b)
 
-    expect(get()).toEqual([ a, b ])
+    expect(dispatch.entries).toEqual([ a, b ])
 
-    _delete(a)
+    dispatch.delete(a)
 
-    expect(get()).toEqual([ b ])
+    expect(dispatch.entries).toEqual([ b ])
 
-    clear()
+    dispatch.clear()
 
-    expect(get()).toEqual([])
+    expect(dispatch.entries).toEqual([])
   })
 })
 
 describe(`bridge`, () => {
   test(`bridging dispatchers`, () => {
-    const dispatch = combineMiddleware(bridge(combineMiddleware()))
+    const dispatch = staticMiddleware(bridge(staticMiddleware()))
 
     expect(dispatch(1, 2, 3)).toEqual([ 1, 2, 3 ])
   })
