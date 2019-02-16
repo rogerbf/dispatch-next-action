@@ -1,4 +1,4 @@
-const { combineMiddleware } = require(`../`)
+const { staticMiddleware } = require(`../`)
 
 const actionTypes = {
   INCREMENT_COUNT: `INCREMENT_COUNT`,
@@ -41,7 +41,7 @@ const loggerMiddleware = () => next => action => {
   return next(action)
 }
 
-const dispatch = combineMiddleware(options, loggerMiddleware, reducerMiddleware)
+const dispatch = staticMiddleware(options, loggerMiddleware, reducerMiddleware)
 
 console.log(dispatch({ type: actionTypes.UPDATE_NAME, payload: `Jean Luc` }))
 console.log(dispatch({ type: actionTypes.INCREMENT_COUNT }))

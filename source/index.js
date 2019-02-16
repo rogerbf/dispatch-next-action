@@ -1,5 +1,5 @@
-import combineMiddleware from "./combine-middleware"
-import dynamicMiddleware from "./dynamic-middleware"
 import bridge from "./bridge"
+import dynamicMiddleware from "./dynamic-middleware"
+import staticMiddleware from "./static-middleware"
 
-export { combineMiddleware, dynamicMiddleware, bridge }
+export { staticMiddleware, dynamicMiddleware, bridge }
