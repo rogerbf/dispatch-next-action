@@ -2,10 +2,10 @@
 
 ## usage
 
-### `combineMiddleware`
+### `staticMiddleware`
 
 ```javascript
-import { combineMiddleware } from "dispatch-next-action"
+import { staticMiddleware } from "dispatch-next-action"
 
 const middleware = (dispatch, options) => next => (action, ...args) => {
   if (action.type === `GET_TIME`) {
@@ -15,7 +15,7 @@ const middleware = (dispatch, options) => next => (action, ...args) => {
   }
 }
 
-const dispatch = combineMiddleware(middleware)
+const dispatch = staticMiddleware(middleware)
 ```
 
 ### `dynamicMiddleware`
@@ -28,34 +28,34 @@ const logger = () => next => (...args) => {
   next(...args)
 }
 
-const middleware = dynamicMiddleware()
+const dispatch = dynamicMiddleware()
 
-middleware.set(logger)
-middleware.dispatch(1, 2, 3)
+dispatch.add(logger)
+dispatch(1, 2, 3)
 ```
 
 ### `bridge`
 
 ```javascript
-import { combineMiddleware, dynamicMiddleware, bridge } from "dispatch-next-action"
+import { staticMiddleware, dynamicMiddleware, bridge } from "dispatch-next-action"
 
 const dynamic = dynamicMiddleware()
-const dispatch = combineMiddleware(bridge(dynamic.dispatch))
+const dispatch = staticMiddleware(bridge(dynamic))
 
 dispatch(1, 2, 3) // [ 1, 2, 3 ]
 ```
 
 ## benchmarks
 
-```
-1 middleware combineMiddleware x 64,776,031 ops/sec ±2.32% (90 runs sampled)
-1 middleware dynamicMiddleware x 24,610,207 ops/sec ±0.96% (91 runs sampled)
-2 middleware combineMiddleware x 38,115,016 ops/sec ±0.91% (95 runs sampled)
-2 middleware dynamicMiddleware x 13,646,395 ops/sec ±0.54% (94 runs sampled)
-4 middleware combineMiddleware x 27,334,789 ops/sec ±0.75% (94 runs sampled)
-4 middleware dynamicMiddleware x 8,575,023 ops/sec ±0.43% (94 runs sampled)
-8 middleware combineMiddleware x 16,203,276 ops/sec ±0.64% (94 runs sampled)
-8 middleware dynamicMiddleware x 3,447,083 ops/sec ±0.50% (96 runs sampled)
-16 middleware combineMiddleware x 8,787,029 ops/sec ±0.68% (91 runs sampled)
-16 middleware dynamicMiddleware x 1,630,401 ops/sec ±0.41% (95 runs sampled)
+```text
+1 middleware static x 64,776,031 ops/sec ±2.32% (90 runs sampled)
+1 middleware dynamic x 24,610,207 ops/sec ±0.96% (91 runs sampled)
+2 middleware static x 38,115,016 ops/sec ±0.91% (95 runs sampled)
+2 middleware dynamic x 13,646,395 ops/sec ±0.54% (94 runs sampled)
+4 middleware static x 27,334,789 ops/sec ±0.75% (94 runs sampled)
+4 middleware dynamic x 8,575,023 ops/sec ±0.43% (94 runs sampled)
+8 middleware static x 16,203,276 ops/sec ±0.64% (94 runs sampled)
+8 middleware dynamic x 3,447,083 ops/sec ±0.50% (96 runs sampled)
+16 middleware static x 8,787,029 ops/sec ±0.68% (91 runs sampled)
+16 middleware dynamic x 1,630,401 ops/sec ±0.41% (95 runs sampled)
 ```
