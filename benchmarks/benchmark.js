@@ -1,6 +1,6 @@
 const { invoke, Suite } = require(`benchmark`)
 const {
-  combineMiddleware,
+  staticMiddleware,
   dynamicMiddleware,
 } = require(`../build/dispatch-next-action`)
 
@@ -12,16 +12,20 @@ const middlewareCounts = [ 1, 2, 4, 8, 16 ]
 invoke(
   middlewareCounts.map(middlewareCount => {
     const suite = new Suite(`${ middlewareCount } middleware`)
-    const fixed = combineMiddleware(...createMiddleware(middlewareCount))
-    const dynamic = dynamicMiddleware(...createMiddleware(middlewareCount))
+    const staticDispatch = staticMiddleware(
+      ...createMiddleware(middlewareCount)
+    )
+    const dynamicDispatch = dynamicMiddleware(
+      ...createMiddleware(middlewareCount)
+    )
     const action = {}
 
     suite
-      .add(`combineMiddleware`, () => {
-        fixed(action)
+      .add(`static`, () => {
+        staticDispatch(action)
       })
-      .add(`dynamicMiddleware`, () => {
-        dynamic.dispatch(action)
+      .add(`dynamic`, () => {
+        dynamicDispatch(action)
       })
 
     return suite
