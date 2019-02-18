@@ -47,15 +47,56 @@ dispatch(1, 2, 3) // [ 1, 2, 3 ]
 
 ## benchmarks
 
+higher is better
+
 ```text
-1 middleware static x 64,329,776 ops/sec ±3.41% (86 runs sampled)
-1 middleware dynamic x 25,286,275 ops/sec ±1.13% (89 runs sampled)
-2 middleware static x 40,616,143 ops/sec ±0.90% (95 runs sampled)
-2 middleware dynamic x 15,723,259 ops/sec ±0.49% (93 runs sampled)
-4 middleware static x 27,915,663 ops/sec ±0.91% (95 runs sampled)
-4 middleware dynamic x 9,480,215 ops/sec ±0.35% (95 runs sampled)
-8 middleware static x 16,861,170 ops/sec ±0.51% (94 runs sampled)
-8 middleware dynamic x 3,699,562 ops/sec ±0.41% (97 runs sampled)
-16 middleware static x 8,657,069 ops/sec ±0.67% (94 runs sampled)
-16 middleware dynamic x 1,708,738 ops/sec ±0.41% (96 runs sampled)
+staticMiddleware (1)
+Raw:
+ > 34676.32367632368
+Average (mean) 34676.32367632368
+
+staticMiddleware (2)
+Raw:
+ > 28737.262737262736
+Average (mean) 28737.262737262736
+
+staticMiddleware (4)
+Raw:
+ > 21694.305694305694
+Average (mean) 21694.305694305694
+
+dynamicMiddleware (1)
+Raw:
+ > 18541.45854145854
+Average (mean) 18541.45854145854
+
+staticMiddleware (8)
+Raw:
+ > 14318.681318681318
+Average (mean) 14318.681318681318
+
+dynamicMiddleware (2)
+Raw:
+ > 13047.952047952049
+Average (mean) 13047.952047952049
+
+dynamicMiddleware (4)
+Raw:
+ > 7731.268731268731
+Average (mean) 7731.268731268731
+
+staticMiddleware (16)
+Raw:
+ > 7580.419580419581
+Average (mean) 7580.419580419581
+
+dynamicMiddleware (8)
+Raw:
+ > 3159.8401598401597
+Average (mean) 3159.8401598401597
+
+dynamicMiddleware (16)
+Raw:
+ > 1298.7012987012988
+Average (mean) 1298.7012987012988
 ```
