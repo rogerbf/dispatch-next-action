@@ -14,6 +14,22 @@ describe(`dynamicMiddleware`, () => {
     expect(typeof dispatch).toBe(`function`)
   })
 
+  test(`initial middleware`, () => {
+    const dispatch = dynamicMiddleware(() => next => action => next(action))
+
+    expect(dispatch()).toEqual([ undefined ])
+  })
+
+  test(`initial middleware (multiple)`, () => {
+    const dispatch = dynamicMiddleware(
+      () => next => action => next(action),
+      () => next => action => next(action),
+      () => next => action => next(action)
+    )
+
+    expect(dispatch()).toEqual([ undefined ])
+  })
+
   test(`dispatch('testing')`, () => {
     expect(dynamicMiddleware()(`testing`)).toEqual([ `testing` ])
   })
@@ -136,5 +152,128 @@ describe(`dynamicMiddleware`, () => {
     dispatch.delete(() => {})
 
     expect(dispatch.entries).toEqual([ middleware ])
+  })
+
+  test(`unshift`, () => {
+    const calls = []
+
+    const middleware = [
+      () => next => action => {
+        calls.push(1)
+        return next(action)
+      },
+    ]
+
+    const dispatch = dynamicMiddleware()
+    dispatch.unshift(...middleware)
+    expect(dispatch.entries).toEqual([ ...middleware ])
+    dispatch()
+    expect(calls).toEqual([ 1 ])
+  })
+
+  test(`unshift (initial middleware)`, () => {
+    const calls = []
+
+    const initialMiddleware = [
+      () => next => action => {
+        calls.push(2)
+        return next(action)
+      },
+    ]
+
+    const middleware = [
+      () => next => action => {
+        calls.push(1)
+        return next(action)
+      },
+    ]
+
+    const dispatch = dynamicMiddleware(...initialMiddleware)
+    dispatch.unshift(...middleware)
+    expect(dispatch.entries).toEqual([ ...middleware, ...initialMiddleware ])
+    dispatch()
+    expect(calls).toEqual([ 1, 2 ])
+  })
+
+  test(`unshift (multiple)`, () => {
+    const calls = []
+
+    const middleware = [
+      () => next => action => {
+        calls.push(1)
+        return next(action)
+      },
+      () => next => action => {
+        calls.push(2)
+        return next(action)
+      },
+    ]
+
+    const dispatch = dynamicMiddleware()
+    dispatch.unshift(...middleware)
+
+    expect(dispatch.entries).toEqual([ ...middleware ])
+    dispatch()
+    expect(calls).toEqual([ 1, 2 ])
+  })
+
+  test(`unshift (multiple with initial)`, () => {
+    const calls = []
+
+    const initialMiddleware = [
+      () => next => action => {
+        calls.push(3)
+        return next(action)
+      },
+    ]
+
+    const middleware = [
+      () => next => action => {
+        calls.push(1)
+        return next(action)
+      },
+      () => next => action => {
+        calls.push(2)
+        return next(action)
+      },
+    ]
+
+    const dispatch = dynamicMiddleware(...initialMiddleware)
+    dispatch.unshift(...middleware)
+
+    expect(dispatch.entries).toEqual([ ...middleware, ...initialMiddleware ])
+    dispatch()
+    expect(calls).toEqual([ 1, 2, 3 ])
+  })
+
+  test(`unshift (multiple, delete one)`, () => {
+    const calls = []
+
+    const initialMiddleware = [
+      () => next => action => {
+        calls.push(3)
+        return next(action)
+      },
+    ]
+
+    const middleware = [
+      () => next => action => {
+        calls.push(1)
+        return next(action)
+      },
+      () => next => action => {
+        calls.push(2)
+        return next(action)
+      },
+    ]
+
+    const dispatch = dynamicMiddleware(...initialMiddleware)
+    dispatch.unshift(...middleware)
+    dispatch()
+    expect(calls).toEqual([ 1, 2, 3 ])
+    dispatch.delete(middleware[1])
+    expect(dispatch.entries).toEqual([ middleware[0], ...initialMiddleware ])
+    dispatch()
+    expect(calls).toEqual([ 1, 2, 3, 1, 3 ])
   })
 })

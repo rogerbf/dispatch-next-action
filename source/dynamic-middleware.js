@@ -15,22 +15,38 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
     return dispatch
   }
 
-  const add = (...args) => {
-    args.forEach(dispatchConsumer => {
-      const nextConsumer = dispatchConsumer(dispatch, context)
-
-      const length = middleware.length
-
-      const actionConsumer = nextConsumer((...args) =>
-        ((middleware[length + 1] || {}).actionConsumer || terminate)(...args)
-      )
-
-      middleware.push({
+  const initialize = (...args) =>
+    args.map(dispatchConsumer => {
+      const initialized = {
         dispatchConsumer,
-        nextConsumer,
-        actionConsumer,
+      }
+
+      initialized.nextConsumer = initialized.dispatchConsumer(dispatch, context)
+
+      initialized.actionConsumer = initialized.nextConsumer((...args) => {
+        const index = middleware.findIndex(
+          ({ dispatchConsumer }) =>
+            dispatchConsumer === initialized.dispatchConsumer
+        )
+
+        const { actionConsumer } = index > -1 ? middleware[index + 1] || {} : {}
+
+        return actionConsumer ? actionConsumer(...args) : terminate(...args)
       })
+
+      return initialized
     })
+
+  const add = (...args) => {
+    initialize(...args).forEach(initialized => middleware.push(initialized))
+
+    return dispatch
+  }
+
+  const unshift = (...args) => {
+    initialize(...args.reverse()).forEach(initialized =>
+      middleware.unshift(initialized)
+    )
 
     return dispatch
   }
@@ -52,6 +68,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
   Object.assign(dispatch, {
     clear,
     add,
+    unshift,
     delete: _delete,
   })
 
