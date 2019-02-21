@@ -1,6 +1,6 @@
 {
   "name": "dispatch-next-action",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "description": "compose static/dynamic middleware",
   "main": "build/dispatch-next-action.js",
   "unpkg": "build/dispatch-next-action.umd.js",
@@ -15,7 +15,7 @@
     "pretest": "npm run build",
     "test": "jest",
     "test:development": "NODE_ENV=development jest",
-    "test:coverage": "NODE_ENV=development jest --coverage",
+    "coverage": "NODE_ENV=development jest --coverage",
     "develop": "NODE_ENV=development jest --watch",
     "benchmark": "npm run build && node ./benchmarks/benchmark.js"
   },
@@ -40,7 +40,7 @@
     "eslint": "5.14.1",
     "jest": "24.1.0",
     "rimraf": "2.6.3",
-    "rollup": "1.2.1",
+    "rollup": "1.2.2",
     "rollup-plugin-babel": "4.3.2",
     "rollup-plugin-commonjs": "9.2.0",
     "rollup-plugin-node-resolve": "4.0.0",
