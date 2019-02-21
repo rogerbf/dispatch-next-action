@@ -9,14 +9,23 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
   const dispatch = (...args) =>
     ((middleware[0] || {}).actionConsumer || terminate)(...args)
 
-  const clear = () => {
-    middleware = []
-
-    return dispatch
-  }
+  const includes = dispatchConsumer =>
+    middleware.findIndex(
+      initialized => initialized.dispatchConsumer === dispatchConsumer
+    ) > -1
 
   const initialize = (...args) =>
     args.map(dispatchConsumer => {
+      if (includes(dispatchConsumer)) {
+        const name = dispatchConsumer.name
+
+        throw new Error(
+          name
+            ? `Trying to add duplicate middleware ( ${ name } )`
+            : `Trying to add duplicate middleware`
+        )
+      }
+
       const initialized = {
         dispatchConsumer,
       }
@@ -29,7 +38,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
             dispatchConsumer === initialized.dispatchConsumer
         )
 
-        const { actionConsumer } = index > -1 ? middleware[index + 1] || {} : {}
+        const { actionConsumer } = (index > -1 && middleware[index + 1]) || {}
 
         return actionConsumer ? actionConsumer(...args) : terminate(...args)
       })
@@ -37,7 +46,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
       return initialized
     })
 
-  const add = (...args) => {
+  const push = (...args) => {
     initialize(...args).forEach(initialized => middleware.push(initialized))
 
     return dispatch
@@ -51,28 +60,47 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
     return dispatch
   }
 
-  const _delete = (...args) => {
-    const filteredMiddleware = middleware
-      .map(({ dispatchConsumer }) => dispatchConsumer)
-      .filter(dispatchConsumer => args.indexOf(dispatchConsumer) === -1)
+  const splice = (start, deleteCount, ...args) => {
+    const initialized = initialize(...args)
+    middleware.splice(start, deleteCount, ...initialized)
 
-    return clear().add(...filteredMiddleware)
+    return dispatch
+  }
+
+  const _delete = (...args) => {
+    args.forEach(dispatchConsumer => {
+      const index = middleware.findIndex(
+        initialized => initialized.dispatchConsumer === dispatchConsumer
+      )
+
+      index > -1 && middleware.splice(index, 1)
+    })
+
+    return dispatch
+  }
+
+  const clear = () => {
+    middleware = []
+
+    return dispatch
   }
 
   if (middleware.length) {
     const initialMiddleware = [ ...middleware ]
     middleware = []
-    add(...initialMiddleware)
+    push(...initialMiddleware)
   }
 
   Object.assign(dispatch, {
     clear,
-    add,
+    push,
     unshift,
+    splice,
     delete: _delete,
+    includes,
   })
 
-  Object.defineProperty(dispatch, `entries`, {
+  Object.defineProperty(dispatch, `current`, {
     get() {
       return middleware.map(({ dispatchConsumer }) => dispatchConsumer)
     },
