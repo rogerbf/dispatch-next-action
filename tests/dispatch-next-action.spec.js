@@ -153,23 +153,23 @@ describe(`dynamicMiddleware`, () => {
 
     const dispatch = dynamicMiddleware()
 
-    expect(dispatch.entries).toEqual([])
+    expect(dispatch.current).toEqual([])
 
-    dispatch.add(a)
+    dispatch.push(a)
 
-    expect(dispatch.entries).toEqual([ a ])
+    expect(dispatch.current).toEqual([ a ])
 
-    dispatch.add(b)
+    dispatch.push(b)
 
-    expect(dispatch.entries).toEqual([ a, b ])
+    expect(dispatch.current).toEqual([ a, b ])
 
     dispatch.delete(a)
 
-    expect(dispatch.entries).toEqual([ b ])
+    expect(dispatch.current).toEqual([ b ])
 
     dispatch.clear()
 
-    expect(dispatch.entries).toEqual([])
+    expect(dispatch.current).toEqual([])
   })
 })
 

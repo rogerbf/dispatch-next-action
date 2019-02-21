@@ -8,10 +8,13 @@ describe(`dynamicMiddleware`, () => {
   it(`returns the expected api`, () => {
     const dispatch = dynamicMiddleware()
 
-    expect(typeof dispatch.add).toBe(`function`)
-    expect(typeof dispatch.delete).toBe(`function`)
-    expect(dispatch.entries).toEqual([])
     expect(typeof dispatch).toBe(`function`)
+    expect(dispatch.current).toEqual([])
+    expect(typeof dispatch.push).toBe(`function`)
+    expect(typeof dispatch.delete).toBe(`function`)
+    expect(typeof dispatch.unshift).toBe(`function`)
+    expect(typeof dispatch.includes).toBe(`function`)
+    expect(typeof dispatch.splice).toBe(`function`)
   })
 
   test(`initial middleware`, () => {
@@ -55,14 +58,14 @@ describe(`dynamicMiddleware`, () => {
     const dispatch = dynamicMiddleware()
 
     expect(dispatch).toEqual(expect.any(Function))
-    expect(dispatch.add).toEqual(expect.any(Function))
+    expect(dispatch.push).toEqual(expect.any(Function))
     expect(dispatch.delete).toEqual(expect.any(Function))
 
     const middleware = jest.fn((dispatch, context) => next => action =>
       next(`testing`)
     )
 
-    dispatch.add(middleware)
+    dispatch.push(middleware)
 
     expect(dispatch()).toEqual([ `testing` ])
 
@@ -84,7 +87,7 @@ describe(`dynamicMiddleware`, () => {
     const dispatch = dynamicMiddleware(middleware.a, middleware.b)
 
     expect(dispatch).toEqual(expect.any(Function))
-    expect(dispatch.add).toEqual(expect.any(Function))
+    expect(dispatch.push).toEqual(expect.any(Function))
     expect(dispatch.delete).toEqual(expect.any(Function))
 
     expect(dispatch()).toEqual([ `a`, `b` ])
@@ -97,25 +100,25 @@ describe(`dynamicMiddleware`, () => {
 
     expect(dispatch()).toEqual([])
 
-    dispatch.add(middleware.a)
+    dispatch.push(middleware.a)
 
     expect(dispatch()).toEqual([ `a` ])
 
     dispatch.delete(middleware.a)
 
-    dispatch.add(middleware.b).add(middleware.a)
+    dispatch.push(middleware.b).push(middleware.a)
 
     expect(dispatch()).toEqual([ `b`, `a` ])
   })
 
-  test(`entries`, () => {
+  test(`current`, () => {
     const middleware = jest.fn((dispatch, context) => next => (...args) =>
       next(...args, `a`)
     )
 
     const dispatch = dynamicMiddleware(middleware)
 
-    expect(dispatch.entries).toEqual([ middleware ])
+    expect(dispatch.current).toEqual([ middleware ])
   })
 
   test(`clear()`, () => {
@@ -130,11 +133,11 @@ describe(`dynamicMiddleware`, () => {
 
     const dispatch = dynamicMiddleware(middleware.a, middleware.b)
 
-    expect(dispatch.entries).toEqual([ middleware.a, middleware.b ])
+    expect(dispatch.current).toEqual([ middleware.a, middleware.b ])
 
     dispatch.clear()
 
-    expect(dispatch.entries).toEqual([])
+    expect(dispatch.current).toEqual([])
   })
 
   test(`delete`, () => {
@@ -145,13 +148,13 @@ describe(`dynamicMiddleware`, () => {
     const dispatch = dynamicMiddleware(middleware)
 
     expect(dispatch.delete(middleware)).toEqual(dispatch)
-    expect(dispatch.entries).toEqual([])
+    expect(dispatch.current).toEqual([])
 
-    dispatch.add(middleware)
+    dispatch.push(middleware)
 
     dispatch.delete(() => {})
 
-    expect(dispatch.entries).toEqual([ middleware ])
+    expect(dispatch.current).toEqual([ middleware ])
   })
 
   test(`unshift`, () => {
@@ -166,7 +169,7 @@ describe(`dynamicMiddleware`, () => {
 
     const dispatch = dynamicMiddleware()
     dispatch.unshift(...middleware)
-    expect(dispatch.entries).toEqual([ ...middleware ])
+    expect(dispatch.current).toEqual([ ...middleware ])
     dispatch()
     expect(calls).toEqual([ 1 ])
   })
@@ -190,7 +193,7 @@ describe(`dynamicMiddleware`, () => {
 
     const dispatch = dynamicMiddleware(...initialMiddleware)
     dispatch.unshift(...middleware)
-    expect(dispatch.entries).toEqual([ ...middleware, ...initialMiddleware ])
+    expect(dispatch.current).toEqual([ ...middleware, ...initialMiddleware ])
     dispatch()
     expect(calls).toEqual([ 1, 2 ])
   })
@@ -212,7 +215,7 @@ describe(`dynamicMiddleware`, () => {
     const dispatch = dynamicMiddleware()
     dispatch.unshift(...middleware)
 
-    expect(dispatch.entries).toEqual([ ...middleware ])
+    expect(dispatch.current).toEqual([ ...middleware ])
     dispatch()
     expect(calls).toEqual([ 1, 2 ])
   })
@@ -241,7 +244,7 @@ describe(`dynamicMiddleware`, () => {
     const dispatch = dynamicMiddleware(...initialMiddleware)
     dispatch.unshift(...middleware)
 
-    expect(dispatch.entries).toEqual([ ...middleware, ...initialMiddleware ])
+    expect(dispatch.current).toEqual([ ...middleware, ...initialMiddleware ])
     dispatch()
     expect(calls).toEqual([ 1, 2, 3 ])
   })
@@ -272,8 +275,81 @@ describe(`dynamicMiddleware`, () => {
     dispatch()
     expect(calls).toEqual([ 1, 2, 3 ])
     dispatch.delete(middleware[1])
-    expect(dispatch.entries).toEqual([ middleware[0], ...initialMiddleware ])
+    expect(dispatch.current).toEqual([ middleware[0], ...initialMiddleware ])
     dispatch()
     expect(calls).toEqual([ 1, 2, 3, 1, 3 ])
+  })
+
+  test(`includes`, () => {
+    const middleware = () => () => () => {}
+
+    expect(dynamicMiddleware(middleware).includes(middleware)).toEqual(true)
+    expect(dynamicMiddleware().includes(middleware)).toEqual(false)
+  })
+
+  test(`splice(1, 0, middleware)`, () => {
+    const addition = () => () => () => {}
+    const initial = [ () => () => () => {}, () => () => () => {} ]
+
+    const dispatch = dynamicMiddleware(...initial)
+
+    dispatch.splice(1, 0, addition)
+
+    expect(dispatch.current).toEqual([ initial[0], addition, initial[1] ])
+  })
+
+  test(`splice(1, 1, middleware)`, () => {
+    const addition = () => () => () => {}
+    const initial = [ () => () => () => {}, () => () => () => {} ]
+
+    const dispatch = dynamicMiddleware(...initial)
+
+    dispatch.splice(1, 1, addition)
+
+    expect(dispatch.current).toEqual([ initial[0], addition ])
+  })
+
+  test(`splice(1, 1, middleware, middleware)`, () => {
+    const additions = [ () => () => () => {}, () => () => () => {} ]
+    const initial = [ () => () => () => {}, () => () => () => {} ]
+
+    const dispatch = dynamicMiddleware(...initial)
+
+    dispatch.splice(1, 1, ...additions)
+
+    expect(dispatch.current).toEqual([ initial[0], ...additions ])
+  })
+
+  test(`duplicate middleware (anonymous)`, () => {
+    const middleware = [ () => () => () => {} ]
+    const dispatch = dynamicMiddleware(...middleware)
+
+    expect(() => dispatch.push(middleware[0])).toThrow(
+      `Trying to add duplicate middleware`
+    )
+    expect(() => dispatch.unshift(middleware[0])).toThrow(
+      `Trying to add duplicate middleware`
+    )
+    expect(() => dispatch.splice(0, 0, middleware[0])).toThrow(
+      `Trying to add duplicate middleware`
+    )
+  })
+
+  test(`duplicate middleware (named)`, () => {
+    function middleware() {
+      return () => () => {}
+    }
+
+    const dispatch = dynamicMiddleware(middleware)
+
+    expect(() => dispatch.push(middleware)).toThrow(
+      `Trying to add duplicate middleware ( middleware )`
+    )
+    expect(() => dispatch.unshift(middleware)).toThrow(
+      `Trying to add duplicate middleware ( middleware )`
+    )
+    expect(() => dispatch.splice(0, 0, middleware)).toThrow(
+      `Trying to add duplicate middleware ( middleware )`
+    )
   })
 })
