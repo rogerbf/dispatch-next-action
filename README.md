@@ -7,7 +7,7 @@
 ```javascript
 import { staticMiddleware } from "dispatch-next-action"
 
-const middleware = (dispatch, options) => next => (action, ...args) => {
+const middleware = (dispatch, context) => next => (action, ...args) => {
   if (action.type === `GET_TIME`) {
     return Date.now()
   } else {
@@ -30,7 +30,7 @@ const logger = () => next => (...args) => {
 
 const dispatch = dynamicMiddleware()
 
-dispatch.add(logger)
+dispatch.push(logger)
 dispatch(1, 2, 3)
 ```
 
