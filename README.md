@@ -25,7 +25,7 @@ import { dynamicMiddleware } from "dispatch-next-action"
 
 const logger = () => next => (...args) => {
   console.log(args)
-  next(...args)
+  return next(...args)
 }
 
 const dispatch = dynamicMiddleware()
