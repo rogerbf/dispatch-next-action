@@ -61,13 +61,28 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
   }
 
   const splice = (start, deleteCount, ...args) => {
+    if (typeof start !== `number`) {
+      throw new TypeError(`Expected first argument to be a number`)
+    }
+
+    if (deleteCount === undefined) {
+      throw new TypeError(
+        `Expected second argument to be either of type number or function`
+      )
+    }
+
+    if (typeof deleteCount === `function`) {
+      args.unshift(deleteCount)
+      deleteCount = 0
+    }
+
     const initialized = initialize(...args)
     middleware.splice(start, deleteCount, ...initialized)
 
     return dispatch
   }
 
-  const _delete = (...args) => {
+  const deleteImplementation = (...args) => {
     args.forEach(dispatchConsumer => {
       const index = middleware.findIndex(
         initialized => initialized.dispatchConsumer === dispatchConsumer
@@ -96,7 +111,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
     push,
     unshift,
     splice,
-    delete: _delete,
+    delete: deleteImplementation,
     includes,
   })
 
