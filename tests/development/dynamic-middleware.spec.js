@@ -287,6 +287,21 @@ describe(`dynamicMiddleware`, () => {
     expect(dynamicMiddleware().includes(middleware)).toEqual(false)
   })
 
+  test(`splice(0, middleware)`, () => {
+    const middleware = () => () => {}
+    const dispatch = dynamicMiddleware(() => () => {})
+    dispatch.splice(0, middleware)
+
+    expect(dispatch.current).toEqual([ middleware, expect.any(Function) ])
+  })
+
+  test(`splice(0, 1)`, () => {
+    const dispatch = dynamicMiddleware(() => () => {})
+    dispatch.splice(0, 1)
+
+    expect(dispatch.current).toEqual([])
+  })
+
   test(`splice(1, 0, middleware)`, () => {
     const addition = () => () => () => {}
     const initial = [ () => () => () => {}, () => () => () => {} ]
@@ -351,5 +366,17 @@ describe(`dynamicMiddleware`, () => {
     expect(() => dispatch.splice(0, 0, middleware)).toThrow(
       `Trying to add duplicate middleware ( middleware )`
     )
+  })
+
+  test(`throws`, () => {
+    expect(() => dynamicMiddleware(() => {})).toThrow()
+
+    const dispatch = dynamicMiddleware()
+
+    expect(() => dispatch.push(() => {})).toThrow()
+    expect(() => dispatch.unshift(() => {})).toThrow()
+    expect(() => dispatch.splice()).toThrow()
+    expect(() => dispatch.splice(0)).toThrow()
+    expect(() => dispatch.splice(0, () => {})).toThrow()
   })
 })
