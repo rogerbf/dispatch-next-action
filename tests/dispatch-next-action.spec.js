@@ -1,7 +1,7 @@
 import {
-  staticMiddleware,
-  dynamicMiddleware,
   bridge,
+  dynamicMiddleware,
+  staticMiddleware,
 } from "../build/dispatch-next-action"
 
 describe(`staticMiddleware`, () => {
@@ -22,13 +22,13 @@ describe(`staticMiddleware`, () => {
     const dispatch = staticMiddleware({ state }, middleware)
 
     expect(dispatch({ type: `GET` })).toEqual(state)
-    expect(dispatch({ type: `SET`, payload: { testing: [ 1, 2 ] } })).toEqual({
-      testing: [ 1, 2 ],
+    expect(dispatch({ type: `SET`, payload: { testing: [1, 2] } })).toEqual({
+      testing: [1, 2],
     })
     expect(dispatch({ type: `GET` })).toEqual({
-      testing: [ 1, 2 ],
+      testing: [1, 2],
     })
-    expect(dispatch({ type: `UNKNOWN` })).toEqual([ { type: `UNKNOWN` } ])
+    expect(dispatch({ type: `UNKNOWN` })).toEqual([{ type: `UNKNOWN` }])
   })
 
   test(`example: state middleware (state via options)`, () => {
@@ -54,7 +54,7 @@ describe(`staticMiddleware`, () => {
       }
     }
 
-    const [ get, set ] = createState()
+    const [get, set] = createState()
     const options = {
       state: {
         get,
@@ -65,11 +65,11 @@ describe(`staticMiddleware`, () => {
     const dispatch = staticMiddleware(options, middleware)
 
     expect(dispatch({ type: `GET` })).toEqual(get())
-    expect(dispatch({ type: `SET`, payload: { testing: [ 1, 2 ] } })).toEqual(
+    expect(dispatch({ type: `SET`, payload: { testing: [1, 2] } })).toEqual(
       get()
     )
     expect(dispatch({ type: `GET` })).toEqual(get())
-    expect(dispatch({ type: `UNKNOWN` })).toEqual([ { type: `UNKNOWN` } ])
+    expect(dispatch({ type: `UNKNOWN` })).toEqual([{ type: `UNKNOWN` }])
   })
 })
 
@@ -77,13 +77,13 @@ describe(`dynamicMiddleware`, () => {
   test(`terminates without middleware`, () => {
     const dispatch = dynamicMiddleware()
 
-    expect(dispatch(1, 2, 3)).toEqual([ 1, 2, 3 ])
+    expect(dispatch(1, 2, 3)).toEqual([1, 2, 3])
   })
 
   test(`example: state middleware`, () => {
     let state = {}
 
-    const middleware = dispatch => next => (action, ...args) => {
+    const middleware = () => next => (action, ...args) => {
       if (action.type === `GET`) {
         return state
       } else if (action.type === `SET`) {
@@ -97,13 +97,13 @@ describe(`dynamicMiddleware`, () => {
     const dispatch = dynamicMiddleware(middleware)
 
     expect(dispatch({ type: `GET` })).toEqual(state)
-    expect(dispatch({ type: `SET`, payload: { testing: [ 1, 2 ] } })).toEqual({
-      testing: [ 1, 2 ],
+    expect(dispatch({ type: `SET`, payload: { testing: [1, 2] } })).toEqual({
+      testing: [1, 2],
     })
     expect(dispatch({ type: `GET` })).toEqual({
-      testing: [ 1, 2 ],
+      testing: [1, 2],
     })
-    expect(dispatch({ type: `UNKNOWN` })).toEqual([ { type: `UNKNOWN` } ])
+    expect(dispatch({ type: `UNKNOWN` })).toEqual([{ type: `UNKNOWN` }])
   })
 
   test(`example: state middleware (state via options)`, () => {
@@ -129,7 +129,7 @@ describe(`dynamicMiddleware`, () => {
       }
     }
 
-    const [ get, set ] = createState()
+    const [get, set] = createState()
     const options = {
       state: {
         get,
@@ -140,11 +140,11 @@ describe(`dynamicMiddleware`, () => {
     const dispatch = dynamicMiddleware(options, middleware)
 
     expect(dispatch({ type: `GET` })).toEqual(get())
-    expect(dispatch({ type: `SET`, payload: { testing: [ 1, 2 ] } })).toEqual(
+    expect(dispatch({ type: `SET`, payload: { testing: [1, 2] } })).toEqual(
       get()
     )
     expect(dispatch({ type: `GET` })).toEqual(get())
-    expect(dispatch({ type: `UNKNOWN` })).toEqual([ { type: `UNKNOWN` } ])
+    expect(dispatch({ type: `UNKNOWN` })).toEqual([{ type: `UNKNOWN` }])
   })
 
   test(`adding/removing middleware`, () => {
@@ -157,15 +157,15 @@ describe(`dynamicMiddleware`, () => {
 
     dispatch.push(a)
 
-    expect(dispatch.current).toEqual([ a ])
+    expect(dispatch.current).toEqual([a])
 
     dispatch.push(b)
 
-    expect(dispatch.current).toEqual([ a, b ])
+    expect(dispatch.current).toEqual([a, b])
 
     dispatch.delete(a)
 
-    expect(dispatch.current).toEqual([ b ])
+    expect(dispatch.current).toEqual([b])
 
     dispatch.clear()
 
@@ -177,6 +177,6 @@ describe(`bridge`, () => {
   test(`bridging dispatchers`, () => {
     const dispatch = staticMiddleware(bridge(staticMiddleware()))
 
-    expect(dispatch(1, 2, 3)).toEqual([ 1, 2, 3 ])
+    expect(dispatch(1, 2, 3)).toEqual([1, 2, 3])
   })
 })

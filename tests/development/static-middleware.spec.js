@@ -12,13 +12,13 @@ describe(`staticMiddleware`, () => {
   })
 
   test(`dispatch without middleware`, () => {
-    expect(staticMiddleware()(`TEST`)).toEqual([ `TEST` ])
+    expect(staticMiddleware()(`TEST`)).toEqual([`TEST`])
   })
 
   test(`middleware initialization`, () => {
     const actionConsumer = jest.fn()
-    const nextConsumer = jest.fn(next => actionConsumer)
-    const middleware = jest.fn(dispatch => nextConsumer)
+    const nextConsumer = jest.fn(() => actionConsumer)
+    const middleware = jest.fn(() => nextConsumer)
 
     const dispatch = staticMiddleware(middleware)
 
@@ -32,9 +32,7 @@ describe(`staticMiddleware`, () => {
       TEST: `TEST`,
     }
 
-    const middleware = jest.fn((dispatch, context) => next => action =>
-      next(action)
-    )
+    const middleware = jest.fn(() => next => action => next(action))
 
     const dispatch = staticMiddleware(context, middleware)
 
@@ -43,11 +41,11 @@ describe(`staticMiddleware`, () => {
   })
 
   test(`multiple middleware`, () => {
-    const firstMiddleware = dispatch => next => (...args) => next(...args, 1)
-    const secondMiddleware = dispatch => next => (...args) => next(...args, 2)
+    const firstMiddleware = () => next => (...args) => next(...args, 1)
+    const secondMiddleware = () => next => (...args) => next(...args, 2)
 
     const dispatch = staticMiddleware(firstMiddleware, secondMiddleware)
 
-    expect(dispatch(`test`)).toEqual([ `test`, 1, 2 ])
+    expect(dispatch(`test`)).toEqual([`test`, 1, 2])
   })
 })

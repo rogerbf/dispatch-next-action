@@ -14,7 +14,7 @@ describe(`bridge`, () => {
 
     const initialized = middleware(() => {})(next)
 
-    expect(initialized(1, 2, 3)).toEqual([ 1, 2, 3 ])
+    expect(initialized(1, 2, 3)).toEqual([1, 2, 3])
     expect(dispatch).toHaveBeenCalledWith(1, 2, 3)
   })
 })

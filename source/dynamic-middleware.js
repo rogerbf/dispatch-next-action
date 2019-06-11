@@ -21,7 +21,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
 
         throw new Error(
           name
-            ? `Trying to add duplicate middleware ( ${ name } )`
+            ? `Trying to add duplicate middleware ( ${name} )`
             : `Trying to add duplicate middleware`
         )
       }
@@ -101,7 +101,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
   }
 
   if (middleware.length) {
-    const initialMiddleware = [ ...middleware ]
+    const initialMiddleware = [...middleware]
     middleware = []
     push(...initialMiddleware)
   }
