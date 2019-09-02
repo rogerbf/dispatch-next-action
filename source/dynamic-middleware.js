@@ -1,3 +1,4 @@
+const FUNCTION = Object.prototype.toString.call(() => {})
 const terminate = (...args) => args
 
 const dynamicMiddleware = (context = {}, ...middleware) => {
@@ -16,6 +17,14 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
 
   const initialize = (...args) =>
     args.map(dispatchConsumer => {
+      if (typeof dispatchConsumer !== "function") {
+        throw new TypeError(
+          `Expected ${FUNCTION}, got ${Object.prototype.toString.call(
+            dispatchConsumer
+          )}`
+        )
+      }
+
       if (includes(dispatchConsumer)) {
         const name = dispatchConsumer.name
 
@@ -32,6 +41,14 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
 
       initialized.nextConsumer = initialized.dispatchConsumer(dispatch, context)
 
+      if (typeof initialized.nextConsumer !== "function") {
+        throw new TypeError(
+          `Expected ${FUNCTION}, got ${Object.prototype.toString.call(
+            initialized.nextConsumer
+          )}`
+        )
+      }
+
       initialized.actionConsumer = initialized.nextConsumer((...args) => {
         const index = middleware.findIndex(
           ({ dispatchConsumer }) =>
@@ -42,6 +59,14 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
 
         return actionConsumer ? actionConsumer(...args) : terminate(...args)
       })
+
+      if (typeof initialized.actionConsumer !== "function") {
+        throw new TypeError(
+          `Expected ${FUNCTION}, got ${Object.prototype.toString.call(
+            initialized.actionConsumer
+          )}`
+        )
+      }
 
       return initialized
     })

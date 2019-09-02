@@ -17,4 +17,11 @@ describe(`bridge`, () => {
     expect(initialized(1, 2, 3)).toEqual([1, 2, 3])
     expect(dispatch).toHaveBeenCalledWith(1, 2, 3)
   })
+
+  test(`throws`, () => {
+    expect(() => bridge("")).toThrow()
+    expect(() => bridge([])).toThrow()
+    expect(() => bridge({})).toThrow()
+    expect(() => bridge(1)).toThrow()
+  })
 })

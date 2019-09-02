@@ -48,4 +48,16 @@ describe(`staticMiddleware`, () => {
 
     expect(dispatch(`test`)).toEqual([`test`, 1, 2])
   })
+
+  test(`throws with unexpected middleware`, () => {
+    expect(() => staticMiddleware({}, "")).toThrow(
+      "Expected [object Function], got [object String]"
+    )
+    expect(() => staticMiddleware(() => "")).toThrow(
+      "Expected [object Function], got [object String]"
+    )
+    expect(() => staticMiddleware(() => () => "")).toThrow(
+      "Expected [object Function], got [object String]"
+    )
+  })
 })

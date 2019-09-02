@@ -274,15 +274,15 @@ describe(`dynamicMiddleware`, () => {
   })
 
   test(`splice(0, middleware)`, () => {
-    const middleware = () => () => {}
-    const dispatch = dynamicMiddleware(() => () => {})
+    const middleware = () => () => () => {}
+    const dispatch = dynamicMiddleware(() => () => () => {})
     dispatch.splice(0, middleware)
 
     expect(dispatch.current).toEqual([middleware, expect.any(Function)])
   })
 
   test(`splice(0, 1)`, () => {
-    const dispatch = dynamicMiddleware(() => () => {})
+    const dispatch = dynamicMiddleware(() => () => () => {})
     dispatch.splice(0, 1)
 
     expect(dispatch.current).toEqual([])
@@ -356,6 +356,16 @@ describe(`dynamicMiddleware`, () => {
 
   test(`throws`, () => {
     expect(() => dynamicMiddleware(() => {})).toThrow()
+    expect(() => dynamicMiddleware(undefined, "")).toThrow(
+      "Expected [object Function], got [object String]"
+    )
+    expect(() => dynamicMiddleware(undefined, () => "")).toThrow(
+      "Expected [object Function], got [object String]"
+    )
+    expect(() => {
+      const dispatch = dynamicMiddleware(undefined, () => () => "")
+      dispatch()
+    }).toThrow("Expected [object Function], got [object String]")
 
     const dispatch = dynamicMiddleware()
 
