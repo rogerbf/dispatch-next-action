@@ -1,4 +1,5 @@
 const FUNCTION = Object.prototype.toString.call(() => {})
+
 const terminate = (...args) => args
 
 const dynamicMiddleware = (context = {}, ...middleware) => {
@@ -12,16 +13,16 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
 
   const includes = dispatchConsumer =>
     middleware.findIndex(
-      initialized => initialized.dispatchConsumer === dispatchConsumer
+      initialized => initialized.dispatchConsumer === dispatchConsumer,
     ) > -1
 
   const initialize = (...args) =>
     args.map(dispatchConsumer => {
-      if (typeof dispatchConsumer !== "function") {
+      if (typeof dispatchConsumer !== 'function') {
         throw new TypeError(
           `Expected ${FUNCTION}, got ${Object.prototype.toString.call(
-            dispatchConsumer
-          )}`
+            dispatchConsumer,
+          )}`,
         )
       }
 
@@ -31,7 +32,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
         throw new Error(
           name
             ? `Trying to add duplicate middleware ( ${name} )`
-            : `Trying to add duplicate middleware`
+            : `Trying to add duplicate middleware`,
         )
       }
 
@@ -41,18 +42,18 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
 
       initialized.nextConsumer = initialized.dispatchConsumer(dispatch, context)
 
-      if (typeof initialized.nextConsumer !== "function") {
+      if (typeof initialized.nextConsumer !== 'function') {
         throw new TypeError(
           `Expected ${FUNCTION}, got ${Object.prototype.toString.call(
-            initialized.nextConsumer
-          )}`
+            initialized.nextConsumer,
+          )}`,
         )
       }
 
       initialized.actionConsumer = initialized.nextConsumer((...args) => {
         const index = middleware.findIndex(
           ({ dispatchConsumer }) =>
-            dispatchConsumer === initialized.dispatchConsumer
+            dispatchConsumer === initialized.dispatchConsumer,
         )
 
         const { actionConsumer } = (index > -1 && middleware[index + 1]) || {}
@@ -60,11 +61,11 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
         return actionConsumer ? actionConsumer(...args) : terminate(...args)
       })
 
-      if (typeof initialized.actionConsumer !== "function") {
+      if (typeof initialized.actionConsumer !== 'function') {
         throw new TypeError(
           `Expected ${FUNCTION}, got ${Object.prototype.toString.call(
-            initialized.actionConsumer
-          )}`
+            initialized.actionConsumer,
+          )}`,
         )
       }
 
@@ -79,7 +80,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
 
   const unshift = (...args) => {
     initialize(...args.reverse()).forEach(initialized =>
-      middleware.unshift(initialized)
+      middleware.unshift(initialized),
     )
 
     return dispatch
@@ -92,7 +93,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
 
     if (deleteCount === undefined) {
       throw new TypeError(
-        `Expected second argument to be either of type number or function`
+        `Expected second argument to be either of type number or function`,
       )
     }
 
@@ -110,7 +111,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
   const deleteImplementation = (...args) => {
     args.forEach(dispatchConsumer => {
       const index = middleware.findIndex(
-        initialized => initialized.dispatchConsumer === dispatchConsumer
+        initialized => initialized.dispatchConsumer === dispatchConsumer,
       )
 
       index > -1 && middleware.splice(index, 1)

@@ -1,11 +1,11 @@
-import bridge from "../../source/bridge"
+import bridge from '../../source/bridge'
 
-describe(`bridge`, () => {
-  it(`is a function`, () => {
-    expect(typeof bridge).toEqual(`function`)
+describe('bridge', () => {
+  it('is a function', () => {
+    expect(typeof bridge).toEqual('function')
   })
 
-  it(`returns a middleware`, () => {
+  it('returns a middleware', () => {
     const dispatch = jest.fn((...args) => args)
 
     const middleware = bridge(dispatch)
@@ -18,8 +18,8 @@ describe(`bridge`, () => {
     expect(dispatch).toHaveBeenCalledWith(1, 2, 3)
   })
 
-  test(`throws`, () => {
-    expect(() => bridge("")).toThrow()
+  test('throws', () => {
+    expect(() => bridge('')).toThrow()
     expect(() => bridge([])).toThrow()
     expect(() => bridge({})).toThrow()
     expect(() => bridge(1)).toThrow()

@@ -10,21 +10,21 @@ const staticMiddleware = (context = {}, ...middleware) => {
 
   middleware = middleware
     .map(dispatchConsumer => {
-      if (typeof dispatchConsumer !== "function") {
+      if (typeof dispatchConsumer !== 'function') {
         throw new TypeError(
           `Expected ${FUNCTION}, got ${Object.prototype.toString.call(
-            dispatchConsumer
-          )}`
+            dispatchConsumer,
+          )}`,
         )
       }
 
       const nextConsumer = dispatchConsumer(dispatch, context)
 
-      if (typeof nextConsumer !== "function") {
+      if (typeof nextConsumer !== 'function') {
         throw new TypeError(
           `Expected ${FUNCTION}, got ${Object.prototype.toString.call(
-            nextConsumer
-          )}`
+            nextConsumer,
+          )}`,
         )
       }
 
@@ -34,17 +34,17 @@ const staticMiddleware = (context = {}, ...middleware) => {
       (next, nextConsumer) => {
         const actionConsumer = nextConsumer(next)
 
-        if (typeof actionConsumer !== "function") {
+        if (typeof actionConsumer !== 'function') {
           throw new TypeError(
             `Expected ${FUNCTION}, got ${Object.prototype.toString.call(
-              actionConsumer
-            )}`
+              actionConsumer,
+            )}`,
           )
         }
 
         return actionConsumer
       },
-      (...args) => args
+      (...args) => args,
     )
 
   return dispatch

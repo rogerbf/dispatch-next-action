@@ -1,6 +1,6 @@
 module.exports = [
-  [ () => next => action => next(action) ],
-  [ () => next => action => next(action), () => next => action => next(action) ],
+  [() => next => action => next(action)],
+  [() => next => action => next(action), () => next => action => next(action)],
   [
     () => next => action => next(action),
     () => next => action => next(action),

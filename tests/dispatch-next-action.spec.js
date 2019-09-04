@@ -2,7 +2,7 @@ import {
   bridge,
   dynamicMiddleware,
   staticMiddleware,
-} from "../build/dispatch-next-action"
+} from '../build/dispatch-next-action'
 
 describe(`staticMiddleware`, () => {
   test(`example: state middleware`, () => {
@@ -66,7 +66,7 @@ describe(`staticMiddleware`, () => {
 
     expect(dispatch({ type: `GET` })).toEqual(get())
     expect(dispatch({ type: `SET`, payload: { testing: [1, 2] } })).toEqual(
-      get()
+      get(),
     )
     expect(dispatch({ type: `GET` })).toEqual(get())
     expect(dispatch({ type: `UNKNOWN` })).toEqual([{ type: `UNKNOWN` }])
@@ -141,7 +141,7 @@ describe(`dynamicMiddleware`, () => {
 
     expect(dispatch({ type: `GET` })).toEqual(get())
     expect(dispatch({ type: `SET`, payload: { testing: [1, 2] } })).toEqual(
-      get()
+      get(),
     )
     expect(dispatch({ type: `GET` })).toEqual(get())
     expect(dispatch({ type: `UNKNOWN` })).toEqual([{ type: `UNKNOWN` }])

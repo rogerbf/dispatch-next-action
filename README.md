@@ -5,7 +5,7 @@
 ### `staticMiddleware`
 
 ```javascript
-import { staticMiddleware } from "dispatch-next-action"
+import { staticMiddleware } from 'dispatch-next-action'
 
 const middleware = (dispatch, context) => next => (action, ...args) => {
   if (action.type === `GET_TIME`) {
@@ -21,7 +21,7 @@ const dispatch = staticMiddleware(middleware)
 ### `dynamicMiddleware`
 
 ```javascript
-import { dynamicMiddleware } from "dispatch-next-action"
+import { dynamicMiddleware } from 'dispatch-next-action'
 
 const logger = () => next => (...args) => {
   console.log(args)
@@ -37,7 +37,11 @@ dispatch(1, 2, 3)
 ### `bridge`
 
 ```javascript
-import { staticMiddleware, dynamicMiddleware, bridge } from "dispatch-next-action"
+import {
+  bridge,
+  dynamicMiddleware,
+  staticMiddleware,
+} from 'dispatch-next-action'
 
 const dynamic = dynamicMiddleware()
 const dispatch = staticMiddleware(bridge(dynamic))

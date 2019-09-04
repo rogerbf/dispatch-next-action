@@ -1,4 +1,4 @@
-import staticMiddleware from "../../source/static-middleware"
+import staticMiddleware from '../../source/static-middleware'
 
 describe(`staticMiddleware`, () => {
   it(`is a function`, () => {
@@ -50,14 +50,14 @@ describe(`staticMiddleware`, () => {
   })
 
   test(`throws with unexpected middleware`, () => {
-    expect(() => staticMiddleware({}, "")).toThrow(
-      "Expected [object Function], got [object String]"
+    expect(() => staticMiddleware({}, '')).toThrow(
+      'Expected [object Function], got [object String]',
     )
-    expect(() => staticMiddleware(() => "")).toThrow(
-      "Expected [object Function], got [object String]"
+    expect(() => staticMiddleware(() => '')).toThrow(
+      'Expected [object Function], got [object String]',
     )
-    expect(() => staticMiddleware(() => () => "")).toThrow(
-      "Expected [object Function], got [object String]"
+    expect(() => staticMiddleware(() => () => '')).toThrow(
+      'Expected [object Function], got [object String]',
     )
   })
 })

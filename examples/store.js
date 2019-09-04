@@ -1,8 +1,8 @@
-const { staticMiddleware } = require(`../`)
+const { staticMiddleware } = require('../')
 
 const actionTypes = {
-  INCREMENT_COUNT: `INCREMENT_COUNT`,
-  UPDATE_NAME: `UPDATE_NAME`,
+  INCREMENT_COUNT: 'INCREMENT_COUNT',
+  UPDATE_NAME: 'UPDATE_NAME',
 }
 
 let state = undefined
@@ -24,15 +24,14 @@ let reducer = (state = { name: undefined, count: 0 }, action) => {
   }
 }
 
-const options = {
+const context = {
   state,
   reducer,
 }
 
-const reducerMiddleware = (dispatch, { state, reducer }) => () => (
-  action = {}
-) => {
+const reducerMiddleware = (_, { state, reducer }) => () => (action = {}) => {
   state = reducer(state, action)
+
   return state
 }
 
@@ -41,7 +40,7 @@ const loggerMiddleware = () => next => action => {
   return next(action)
 }
 
-const dispatch = staticMiddleware(options, loggerMiddleware, reducerMiddleware)
+const dispatch = staticMiddleware(context, loggerMiddleware, reducerMiddleware)
 
-console.log(dispatch({ type: actionTypes.UPDATE_NAME, payload: `Jean Luc` }))
+console.log(dispatch({ type: actionTypes.UPDATE_NAME, payload: 'Jean Luc' }))
 console.log(dispatch({ type: actionTypes.INCREMENT_COUNT }))
