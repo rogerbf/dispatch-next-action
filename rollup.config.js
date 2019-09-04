@@ -1,10 +1,13 @@
-import nodeResolve from "rollup-plugin-node-resolve"
-import commonjs from "rollup-plugin-commonjs"
-import babel from "rollup-plugin-babel"
-import replace from "rollup-plugin-replace"
-import { terser } from "rollup-plugin-terser"
+import babel from 'rollup-plugin-babel'
+import commonjs from 'rollup-plugin-commonjs'
+import nodeResolve from 'rollup-plugin-node-resolve'
+import replace from 'rollup-plugin-replace'
+import { terser } from 'rollup-plugin-terser'
+import pkg from './package.json'
 
-import pkg from "./package.json"
+const babelConfig = {
+  babelrc: false,
+}
 
 export default [
   // CommonJS
@@ -19,7 +22,14 @@ export default [
       ...Object.keys(pkg.dependencies || {}),
       ...Object.keys(pkg.peerDependencies || {}),
     ],
-    plugins: [babel()],
+    plugins: [
+      babel({
+        ...babelConfig,
+        presets: [
+          ['@babel/env', { modules: false, targets: { node: 'current' } }],
+        ],
+      }),
+    ],
   },
 
   // ES
@@ -34,7 +44,14 @@ export default [
       ...Object.keys(pkg.dependencies || {}),
       ...Object.keys(pkg.peerDependencies || {}),
     ],
-    plugins: [babel()],
+    plugins: [
+      babel({
+        ...babelConfig,
+        presets: [
+          ['@babel/env', { modules: false, targets: { node: 'current' } }],
+        ],
+      }),
+    ],
   },
 
   // ES for Browsers
@@ -49,7 +66,7 @@ export default [
       nodeResolve(),
       commonjs(),
       replace({
-        "process.env.NODE_ENV": JSON.stringify(`production`),
+        'process.env.NODE_ENV': JSON.stringify(`production`),
       }),
       terser({
         compress: {
@@ -68,17 +85,19 @@ export default [
     output: {
       file: `build/dispatch-next-action.umd.js`,
       format: `umd`,
-      name: `DNA`,
+      name: `DispatchNextAction`,
       indent: false,
     },
     plugins: [
       nodeResolve(),
       commonjs(),
       babel({
+        ...babelConfig,
         exclude: `node_modules/**`,
+        presets: [['@babel/env', { modules: false, targets: { ie: '11' } }]],
       }),
       replace({
-        "process.env.NODE_ENV": JSON.stringify(`development`),
+        'process.env.NODE_ENV': JSON.stringify(`development`),
       }),
     ],
   },
@@ -89,17 +108,19 @@ export default [
     output: {
       file: `build/dispatch-next-action.umd.min.js`,
       format: `umd`,
-      name: `DNA`,
+      name: `DispatchNextAction`,
       indent: false,
     },
     plugins: [
       nodeResolve(),
       commonjs(),
       babel({
+        ...babelConfig,
         exclude: `node_modules/**`,
+        presets: [['@babel/env', { modules: false, targets: { ie: 11 } }]],
       }),
       replace({
-        "process.env.NODE_ENV": JSON.stringify(`production`),
+        'process.env.NODE_ENV': JSON.stringify(`production`),
       }),
       terser({
         compress: {

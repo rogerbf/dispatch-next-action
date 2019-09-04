@@ -9,15 +9,16 @@
     "build"
   ],
   "scripts": {
+    "benchmark": "npm run clean && npm run build && node ./benchmarks/benchmark.js",
     "build": "rollup -c",
     "clean": "rimraf build coverage .cache dist",
-    "prepare": "npm run clean && npm test",
-    "pretest": "npm run build",
-    "test": "jest",
-    "test:development": "NODE_ENV=development jest",
     "coverage": "NODE_ENV=development jest --coverage",
     "develop": "NODE_ENV=development jest --watch",
-    "benchmark": "npm run build && node ./benchmarks/benchmark.js"
+    "format": "prettier --write **/*.js",
+    "lint": "eslint --fix .",
+    "prepublish": "npm run test",
+    "pretest": "npm run clean && npm run format && npm run lint && npm run build",
+    "test": "jest"
   },
   "keywords": [
     "middleware",
@@ -30,33 +31,40 @@
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "7.5.5",
-    "@babel/plugin-external-helpers": "7.2.0",
-    "@babel/plugin-proposal-object-rest-spread": "7.5.5",
-    "@babel/plugin-syntax-object-rest-spread": "7.2.0",
-    "@babel/plugin-transform-modules-commonjs": "7.5.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.5.0",
     "@babel/preset-env": "7.5.5",
-    "babel-jest": "24.9.0",
+    "babel-eslint": "^10.0.3",
     "bench": "0.3.6",
-    "eslint": "6.1.0",
-    "eslint-config-prettier": "^6.0.0",
-    "eslint-plugin-prettier": "^3.1.0",
+    "eslint": "6.3.0",
+    "eslint-config-prettier": "^6.1.0",
+    "husky": "^3.0.5",
     "jest": "24.9.0",
+    "lint-staged": "^9.2.5",
     "prettier": "^1.18.2",
     "rimraf": "3.0.0",
-    "rollup": "1.19.4",
+    "rollup": "1.20.3",
     "rollup-plugin-babel": "4.3.3",
-    "rollup-plugin-commonjs": "10.0.2",
+    "rollup-plugin-commonjs": "10.1.0",
     "rollup-plugin-node-resolve": "5.2.0",
     "rollup-plugin-replace": "2.2.0",
     "rollup-plugin-terser": "5.1.1"
-  },
-  "directories": {
-    "test": "tests"
   },
   "dependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rogerbf/dispatch-next-action.git"
   },
-  "homepage": "https://github.com/rogerbf/dispatch-next-action#readme"
+  "homepage": "https://github.com/rogerbf/dispatch-next-action#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "npm run format",
+      "npm run lint",
+      "git add"
+    ]
+  }
 }
