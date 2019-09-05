@@ -3,7 +3,7 @@ const FUNCTION = Object.prototype.toString.call(() => {})
 const terminate = (...args) => args
 
 const dynamicMiddleware = (context = {}, ...middleware) => {
-  if (typeof context === `function`) {
+  if (typeof context === 'function') {
     middleware.unshift(context)
     context = undefined
   }
@@ -36,7 +36,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
         throw new Error(
           name
             ? `Trying to add duplicate middleware ( ${name} )`
-            : `Trying to add duplicate middleware`,
+            : 'Trying to add duplicate middleware',
         )
       }
 
@@ -91,17 +91,17 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
   }
 
   const splice = (start, deleteCount, ...args) => {
-    if (typeof start !== `number`) {
-      throw new TypeError(`Expected first argument to be a number`)
+    if (typeof start !== 'number') {
+      throw new TypeError('Expected first argument to be a number')
     }
 
     if (deleteCount === undefined) {
       throw new TypeError(
-        `Expected second argument to be either of type number or function`,
+        'Expected second argument to be either of type number or function',
       )
     }
 
-    if (typeof deleteCount === `function`) {
+    if (typeof deleteCount === 'function') {
       args.unshift(deleteCount)
       deleteCount = 0
     }
@@ -145,7 +145,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
     includes,
   })
 
-  Object.defineProperty(dispatch, `current`, {
+  Object.defineProperty(dispatch, 'current', {
     get() {
       return middleware.map(({ dispatchConsumer }) => dispatchConsumer)
     },
