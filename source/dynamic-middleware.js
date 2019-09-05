@@ -8,8 +8,12 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
     context = undefined
   }
 
+  let initialized = false
+  let dispatchQueue = []
   const dispatch = (...args) =>
-    ((middleware[0] || {}).actionConsumer || terminate)(...args)
+    initialized
+      ? ((middleware[0] || {}).actionConsumer || terminate)(...args)
+      : dispatchQueue.push(args)
 
   const includes = dispatchConsumer =>
     middleware.findIndex(
@@ -146,6 +150,10 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
       return middleware.map(({ dispatchConsumer }) => dispatchConsumer)
     },
   })
+
+  initialized = true
+  dispatchQueue.forEach(args => dispatch(...args))
+  dispatchQueue = null
 
   return dispatch
 }

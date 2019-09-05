@@ -60,4 +60,65 @@ describe(`staticMiddleware`, () => {
       'Expected [object Function], got [object String]',
     )
   })
+
+  test(`queues up dispatches during initialization`, () => {
+    const actionConsumer = jest.fn()
+
+    const dispatch = staticMiddleware(
+      dispatch => {
+        dispatch(1, 2, 3)
+        return next => {
+          dispatch(4, 5, 6)
+          return (...action) => next(...action)
+        }
+      },
+      () => () => actionConsumer,
+    )
+
+    dispatch(7)
+
+    expect(actionConsumer).toHaveBeenNthCalledWith(1, 1, 2, 3)
+    expect(actionConsumer).toHaveBeenNthCalledWith(2, 4, 5, 6)
+    expect(actionConsumer).toHaveBeenNthCalledWith(3, 7)
+  })
+
+  test(`queues up dispatches during initialization (async)`, () => {
+    return new Promise(resolve => {
+      const actionConsumer = jest.fn()
+
+      const dispatch = staticMiddleware(
+        dispatch => {
+          dispatch(1)
+
+          setTimeout(() => {
+            expect(actionConsumer).toHaveBeenNthCalledWith(1, 1)
+            expect(actionConsumer).toHaveBeenNthCalledWith(2, 2)
+            expect(actionConsumer).toHaveBeenNthCalledWith(3, 3)
+            expect(actionConsumer).not.toHaveBeenNthCalledWith(4, 4)
+
+            dispatch(4)
+
+            expect(actionConsumer).toHaveBeenNthCalledWith(4, 4)
+          }, 0)
+
+          return next => {
+            dispatch(2)
+
+            setTimeout(() => {
+              dispatch(5)
+
+              expect(actionConsumer).toHaveBeenNthCalledWith(5, 5)
+
+              resolve()
+            }, 0)
+
+            return (...action) => next(...action)
+          }
+        },
+        () => () => actionConsumer,
+      )
+
+      dispatch(3)
+    })
+  })
 })

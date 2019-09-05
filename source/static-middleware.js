@@ -6,7 +6,10 @@ const staticMiddleware = (context = {}, ...middleware) => {
     context = undefined
   }
 
-  const dispatch = (...args) => middleware(...args)
+  let initialized = false
+  let dispatchQueue = []
+  let dispatch = (...args) =>
+    initialized ? middleware(...args) : dispatchQueue.push(args)
 
   middleware = middleware
     .map(dispatchConsumer => {
@@ -46,6 +49,10 @@ const staticMiddleware = (context = {}, ...middleware) => {
       },
       (...args) => args,
     )
+
+  initialized = true
+  dispatchQueue.forEach(args => dispatch(...args))
+  dispatchQueue = null
 
   return dispatch
 }
