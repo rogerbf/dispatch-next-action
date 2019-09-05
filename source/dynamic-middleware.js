@@ -1,5 +1,3 @@
-const FUNCTION = Object.prototype.toString.call(() => {})
-
 const terminate = (...args) => args
 
 const dynamicMiddleware = (context = {}, ...middleware) => {
@@ -24,7 +22,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
     args.map(dispatchConsumer => {
       if (typeof dispatchConsumer !== 'function') {
         throw new TypeError(
-          `Expected ${FUNCTION}, got ${Object.prototype.toString.call(
+          `Expected [object Function], got ${Object.prototype.toString.call(
             dispatchConsumer,
           )}`,
         )
@@ -48,7 +46,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
 
       if (typeof initialized.nextConsumer !== 'function') {
         throw new TypeError(
-          `Expected ${FUNCTION}, got ${Object.prototype.toString.call(
+          `Expected [object Function], got ${Object.prototype.toString.call(
             initialized.nextConsumer,
           )}`,
         )
@@ -67,7 +65,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
 
       if (typeof initialized.actionConsumer !== 'function') {
         throw new TypeError(
-          `Expected ${FUNCTION}, got ${Object.prototype.toString.call(
+          `Expected [object Function], got ${Object.prototype.toString.call(
             initialized.actionConsumer,
           )}`,
         )

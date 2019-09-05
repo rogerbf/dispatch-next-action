@@ -1,9 +1,9 @@
 export default dispatch => {
   if (typeof dispatch !== 'function') {
     throw new TypeError(
-      `Expected ${Object.prototype.toString.call(
-        () => {},
-      )}, got ${Object.prototype.toString.call(dispatch)}`,
+      `Expected [object Function], got ${Object.prototype.toString.call(
+        dispatch,
+      )}`,
     )
   }
 
