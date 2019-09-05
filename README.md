@@ -8,7 +8,7 @@
 import { staticMiddleware } from 'dispatch-next-action'
 
 const middleware = (dispatch, context) => next => (action, ...args) => {
-  if (action.type === `GET_TIME`) {
+  if (action.type === 'GET_TIME') {
     return Date.now()
   } else {
     return next(action, ...args)
