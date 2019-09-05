@@ -1,6 +1,6 @@
 {
   "name": "dispatch-next-action",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "compose static/dynamic middleware",
   "main": "build/dispatch-next-action.js",
   "unpkg": "build/dispatch-next-action.umd.js",
