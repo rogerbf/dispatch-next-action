@@ -6,15 +6,13 @@ describe('bridge', () => {
   })
 
   it('returns a middleware', () => {
-    const dispatch = jest.fn((...args) => args)
-
+    const dispatch = jest.fn()
     const middleware = bridge(dispatch)
-
-    const next = jest.fn((...args) => args)
-
+    const next = (...args) => args
     const initialized = middleware(() => {})(next)
 
-    expect(initialized(1, 2, 3)).toEqual([1, 2, 3])
+    initialized(1, 2, 3)
+
     expect(dispatch).toHaveBeenCalledWith(1, 2, 3)
   })
 

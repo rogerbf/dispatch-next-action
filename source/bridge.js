@@ -7,5 +7,5 @@ export default dispatch => {
     )
   }
 
-  return () => next => (...args) => next(...dispatch(...args))
+  return () => next => (...args) => next(dispatch(...args))
 }

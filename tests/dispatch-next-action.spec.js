@@ -177,6 +177,6 @@ describe('bridge', () => {
   test('bridging dispatchers', () => {
     const dispatch = staticMiddleware(bridge(staticMiddleware()))
 
-    expect(dispatch(1, 2, 3)).toEqual([1, 2, 3])
+    expect(dispatch(1, 2, 3)).toEqual([[1, 2, 3]])
   })
 })
