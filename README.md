@@ -56,51 +56,51 @@ higher is better
 ```text
 staticMiddleware (1)
 Raw:
- > 34676.32367632368
-Average (mean) 34676.32367632368
-
-staticMiddleware (2)
-Raw:
- > 28737.262737262736
-Average (mean) 28737.262737262736
-
-staticMiddleware (4)
-Raw:
- > 21694.305694305694
-Average (mean) 21694.305694305694
+ > 175715.2847152847
+Average (mean) 175715.2847152847
 
 dynamicMiddleware (1)
 Raw:
- > 18541.45854145854
-Average (mean) 18541.45854145854
+ > 65905.0949050949
+Average (mean) 65905.0949050949
 
-staticMiddleware (8)
+staticMiddleware (2)
 Raw:
- > 14318.681318681318
-Average (mean) 14318.681318681318
+ > 15380.61938061938
+Average (mean) 15380.61938061938
 
 dynamicMiddleware (2)
 Raw:
- > 13047.952047952049
-Average (mean) 13047.952047952049
+ > 13969.03096903097
+Average (mean) 13969.03096903097
+
+staticMiddleware (4)
+Raw:
+ > 12641.358641358642
+Average (mean) 12641.358641358642
+
+staticMiddleware (8)
+Raw:
+ > 10307.692307692309
+Average (mean) 10307.692307692309
 
 dynamicMiddleware (4)
 Raw:
- > 7731.268731268731
-Average (mean) 7731.268731268731
+ > 8000.999000999001
+Average (mean) 8000.999000999001
 
 staticMiddleware (16)
 Raw:
- > 7580.419580419581
-Average (mean) 7580.419580419581
+ > 7501.498501498501
+Average (mean) 7501.498501498501
 
 dynamicMiddleware (8)
 Raw:
- > 3159.8401598401597
-Average (mean) 3159.8401598401597
+ > 3695.304695304695
+Average (mean) 3695.304695304695
 
 dynamicMiddleware (16)
 Raw:
- > 1298.7012987012988
-Average (mean) 1298.7012987012988
+ > 1336.6633366633366
+Average (mean) 1336.6633366633366
 ```
