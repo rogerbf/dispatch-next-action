@@ -1,6 +1,9 @@
+const toString = x => Object.prototype.toString.call(x)
+const FUNCTION = toString(Function)
+
 const terminate = (...args) => args
 
-const dynamicMiddleware = (context = {}, ...middleware) => {
+const dynamicMiddleware = (context, ...middleware) => {
   if (typeof context === 'function') {
     middleware.unshift(context)
     context = undefined
@@ -8,6 +11,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
 
   let initialized = false
   let dispatchQueue = []
+
   const dispatch = (...args) =>
     initialized
       ? ((middleware[0] || {}).actionConsumer || terminate)(...args)
@@ -22,9 +26,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
     args.map(dispatchConsumer => {
       if (typeof dispatchConsumer !== 'function') {
         throw new TypeError(
-          `Expected [object Function], got ${Object.prototype.toString.call(
-            dispatchConsumer,
-          )}`,
+          `Expected ${FUNCTION}, got ${toString(dispatchConsumer)}`,
         )
       }
 
@@ -42,13 +44,23 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
         dispatchConsumer,
       }
 
-      initialized.nextConsumer = initialized.dispatchConsumer(dispatch, context)
+      const registerDeleteListener = onDelete => {
+        if (typeof onDelete !== 'function') {
+          throw new TypeError(`Expected ${FUNCTION}, got ${toString(onDelete)}`)
+        }
+
+        initialized.onDelete = onDelete
+      }
+
+      initialized.nextConsumer = initialized.dispatchConsumer(
+        dispatch,
+        context,
+        registerDeleteListener,
+      )
 
       if (typeof initialized.nextConsumer !== 'function') {
         throw new TypeError(
-          `Expected [object Function], got ${Object.prototype.toString.call(
-            initialized.nextConsumer,
-          )}`,
+          `Expected ${FUNCTION}, got ${toString(initialized.nextConsumer)}`,
         )
       }
 
@@ -65,9 +77,7 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
 
       if (typeof initialized.actionConsumer !== 'function') {
         throw new TypeError(
-          `Expected [object Function], got ${Object.prototype.toString.call(
-            initialized.actionConsumer,
-          )}`,
+          `Expected ${FUNCTION}, got ${toString(initialized.actionConsumer)}`,
         )
       }
 
@@ -105,7 +115,10 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
     }
 
     const initialized = initialize(...args)
-    middleware.splice(start, deleteCount, ...initialized)
+
+    middleware
+      .splice(start, deleteCount, ...initialized)
+      .map(({ onDelete }) => onDelete && onDelete())
 
     return dispatch
   }
@@ -116,14 +129,22 @@ const dynamicMiddleware = (context = {}, ...middleware) => {
         initialized => initialized.dispatchConsumer === dispatchConsumer,
       )
 
-      index > -1 && middleware.splice(index, 1)
+      index > -1 &&
+        middleware
+          .splice(index, 1)
+          .map(({ onDelete }) => onDelete && onDelete())
     })
 
     return dispatch
   }
 
   const clear = () => {
-    middleware = []
+    const nextMiddleware = middleware.reduce((next, { onDelete }) => {
+      onDelete && onDelete()
+      return next
+    }, [])
+
+    middleware = nextMiddleware
 
     return dispatch
   }

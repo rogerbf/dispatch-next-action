@@ -43,7 +43,11 @@ describe('dynamicMiddleware', () => {
 
     dynamicMiddleware(context, middleware)
 
-    expect(middleware).toHaveBeenCalledWith(expect.any(Function), context)
+    expect(middleware).toHaveBeenCalledWith(
+      expect.any(Function),
+      context,
+      expect.any(Function),
+    )
   })
 
   test('dispatch(1, 2, 3)', () => {
@@ -354,6 +358,28 @@ describe('dynamicMiddleware', () => {
     )
   })
 
+  test('combination of duplicate and new middleware', () => {
+    const middlewareA = () => () => () => {}
+    const middlewareB = () => () => () => {}
+    const middlewareC = () => () => () => {}
+
+    const dispatch = dynamicMiddleware(middlewareA, middlewareB)
+
+    let caughtError
+
+    try {
+      dispatch.splice(0, middlewareC, middlewareB)
+    } catch (error) {
+      caughtError = error
+    }
+
+    expect(caughtError).toBeDefined()
+    expect(caughtError.message).toEqual(
+      'Trying to add duplicate middleware ( middlewareB )',
+    )
+    expect(dispatch.current).toEqual([middlewareA, middlewareB])
+  })
+
   test('throws', () => {
     expect(() => dynamicMiddleware(() => {})).toThrow()
     expect(() => dynamicMiddleware(undefined, '')).toThrow(
@@ -435,5 +461,78 @@ describe('dynamicMiddleware', () => {
 
       dispatch(3)
     })
+  })
+
+  test('cleanup function is called when middleware is removed', () => {
+    const cleanup = jest.fn()
+
+    const middleware = (_, context, onRemove) => {
+      onRemove(cleanup)
+      return next => action => next(action)
+    }
+
+    expect(cleanup).not.toHaveBeenCalled()
+    dynamicMiddleware(middleware).clear()
+    expect(cleanup).toHaveBeenCalled()
+  })
+
+  test('cleanup function is called when middleware is removed via splice', () => {
+    const cleanup = jest.fn()
+
+    const middleware = (_, context, onRemove) => {
+      onRemove(cleanup)
+      return next => action => next(action)
+    }
+
+    expect(cleanup).not.toHaveBeenCalled()
+    const m = dynamicMiddleware(middleware).splice(0, 1)
+    expect(cleanup).toHaveBeenCalled()
+    expect(m.current).toEqual([])
+  })
+
+  test('dispatch is available during cleanup', () => {
+    const middleware = dynamicMiddleware()
+    const cleanup = jest.fn()
+
+    const additionalMiddleware = (dispatch, context, onRemove) => {
+      onRemove(() => cleanup(dispatch))
+
+      return next => action => next(action)
+    }
+
+    middleware.push(additionalMiddleware)
+    middleware.delete(additionalMiddleware)
+
+    expect(cleanup).toHaveBeenCalledWith(middleware)
+  })
+
+  test('throws when cleanup is not a function', () => {
+    expect(() => {
+      dynamicMiddleware().push((_, context, onRemove) => {
+        onRemove('')
+        return next => action => next(action)
+      })
+    }).toThrow()
+
+    expect(() => {
+      dynamicMiddleware().push((_, context, onRemove) => {
+        onRemove(1)
+        return next => action => next(action)
+      })
+    }).toThrow()
+
+    expect(() => {
+      dynamicMiddleware().push((_, context, onRemove) => {
+        onRemove({})
+        return next => action => next(action)
+      })
+    }).toThrow()
+
+    expect(() => {
+      dynamicMiddleware().push((_, context, onRemove) => {
+        onRemove([])
+        return next => action => next(action)
+      })
+    }).toThrow()
   })
 })
