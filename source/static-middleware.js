@@ -1,3 +1,6 @@
+const toString = x => Object.prototype.toString.call(x)
+const FUNCTION = toString(Function)
+
 const staticMiddleware = (context = {}, ...middleware) => {
   if (typeof context === 'function') {
     middleware.unshift(context)
@@ -6,6 +9,7 @@ const staticMiddleware = (context = {}, ...middleware) => {
 
   let initialized = false
   let dispatchQueue = []
+
   let dispatch = (...args) =>
     initialized ? middleware(...args) : dispatchQueue.push(args)
 
@@ -13,9 +17,7 @@ const staticMiddleware = (context = {}, ...middleware) => {
     .map(dispatchConsumer => {
       if (typeof dispatchConsumer !== 'function') {
         throw new TypeError(
-          `Expected [object Function], got ${Object.prototype.toString.call(
-            dispatchConsumer,
-          )}`,
+          `Expected ${FUNCTION}, got ${toString(dispatchConsumer)}`,
         )
       }
 
@@ -23,9 +25,7 @@ const staticMiddleware = (context = {}, ...middleware) => {
 
       if (typeof nextConsumer !== 'function') {
         throw new TypeError(
-          `Expected [object Function], got ${Object.prototype.toString.call(
-            nextConsumer,
-          )}`,
+          `Expected ${FUNCTION}, got ${toString(nextConsumer)}`,
         )
       }
 
@@ -37,9 +37,7 @@ const staticMiddleware = (context = {}, ...middleware) => {
 
         if (typeof actionConsumer !== 'function') {
           throw new TypeError(
-            `Expected [object Function], got ${Object.prototype.toString.call(
-              actionConsumer,
-            )}`,
+            `Expected ${FUNCTION}, got ${toString(actionConsumer)}`,
           )
         }
 
