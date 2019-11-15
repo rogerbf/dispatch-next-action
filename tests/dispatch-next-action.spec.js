@@ -119,7 +119,7 @@ describe('dynamicMiddleware', () => {
       ]
     }
 
-    const middleware = (dispatch, { state }) => next => (action, ...args) => {
+    const middleware = (_, { state }) => next => (action, ...args) => {
       if (action.type === 'GET') {
         return state.get()
       } else if (action.type === 'SET') {
