@@ -2,16 +2,16 @@ import {
   bridge,
   dynamicMiddleware,
   staticMiddleware,
-} from '../build/dispatch-next-action'
+} from "../build/dispatch-next-action"
 
-describe('staticMiddleware', () => {
-  test('example: state middleware', () => {
+describe("staticMiddleware", () => {
+  test("example: state middleware", () => {
     const state = {}
 
-    const middleware = (dispatch, { state }) => next => (action, ...args) => {
-      if (action.type === 'GET') {
+    const middleware = (dispatch, { state }) => (next) => (action, ...args) => {
+      if (action.type === "GET") {
         return state
-      } else if (action.type === 'SET') {
+      } else if (action.type === "SET") {
         state = action.payload
         return state
       } else {
@@ -21,33 +21,33 @@ describe('staticMiddleware', () => {
 
     const dispatch = staticMiddleware({ state }, middleware)
 
-    expect(dispatch({ type: 'GET' })).toEqual(state)
-    expect(dispatch({ type: 'SET', payload: { testing: [1, 2] } })).toEqual({
+    expect(dispatch({ type: "GET" })).toEqual(state)
+    expect(dispatch({ type: "SET", payload: { testing: [1, 2] } })).toEqual({
       testing: [1, 2],
     })
-    expect(dispatch({ type: 'GET' })).toEqual({
+    expect(dispatch({ type: "GET" })).toEqual({
       testing: [1, 2],
     })
-    expect(dispatch({ type: 'UNKNOWN' })).toEqual([{ type: 'UNKNOWN' }])
+    expect(dispatch({ type: "UNKNOWN" })).toEqual([{ type: "UNKNOWN" }])
   })
 
-  test('example: state middleware (state via options)', () => {
+  test("example: state middleware (state via options)", () => {
     const createState = () => {
       let state = {}
 
       return [
         () => state,
-        updatedState => {
+        (updatedState) => {
           state = updatedState
           return state
         },
       ]
     }
 
-    const middleware = (dispatch, { state }) => next => (action, ...args) => {
-      if (action.type === 'GET') {
+    const middleware = (dispatch, { state }) => (next) => (action, ...args) => {
+      if (action.type === "GET") {
         return state.get()
-      } else if (action.type === 'SET') {
+      } else if (action.type === "SET") {
         return state.set(action.payload)
       } else {
         return next(action, ...args)
@@ -64,29 +64,29 @@ describe('staticMiddleware', () => {
 
     const dispatch = staticMiddleware(options, middleware)
 
-    expect(dispatch({ type: 'GET' })).toEqual(get())
-    expect(dispatch({ type: 'SET', payload: { testing: [1, 2] } })).toEqual(
-      get(),
+    expect(dispatch({ type: "GET" })).toEqual(get())
+    expect(dispatch({ type: "SET", payload: { testing: [1, 2] } })).toEqual(
+      get()
     )
-    expect(dispatch({ type: 'GET' })).toEqual(get())
-    expect(dispatch({ type: 'UNKNOWN' })).toEqual([{ type: 'UNKNOWN' }])
+    expect(dispatch({ type: "GET" })).toEqual(get())
+    expect(dispatch({ type: "UNKNOWN" })).toEqual([{ type: "UNKNOWN" }])
   })
 })
 
-describe('dynamicMiddleware', () => {
-  test('terminates without middleware', () => {
+describe("dynamicMiddleware", () => {
+  test("terminates without middleware", () => {
     const dispatch = dynamicMiddleware()
 
     expect(dispatch(1, 2, 3)).toEqual([1, 2, 3])
   })
 
-  test('example: state middleware', () => {
+  test("example: state middleware", () => {
     let state = {}
 
-    const middleware = () => next => (action, ...args) => {
-      if (action.type === 'GET') {
+    const middleware = () => (next) => (action, ...args) => {
+      if (action.type === "GET") {
         return state
-      } else if (action.type === 'SET') {
+      } else if (action.type === "SET") {
         state = action.payload
         return state
       } else {
@@ -96,33 +96,33 @@ describe('dynamicMiddleware', () => {
 
     const dispatch = dynamicMiddleware(middleware)
 
-    expect(dispatch({ type: 'GET' })).toEqual(state)
-    expect(dispatch({ type: 'SET', payload: { testing: [1, 2] } })).toEqual({
+    expect(dispatch({ type: "GET" })).toEqual(state)
+    expect(dispatch({ type: "SET", payload: { testing: [1, 2] } })).toEqual({
       testing: [1, 2],
     })
-    expect(dispatch({ type: 'GET' })).toEqual({
+    expect(dispatch({ type: "GET" })).toEqual({
       testing: [1, 2],
     })
-    expect(dispatch({ type: 'UNKNOWN' })).toEqual([{ type: 'UNKNOWN' }])
+    expect(dispatch({ type: "UNKNOWN" })).toEqual([{ type: "UNKNOWN" }])
   })
 
-  test('example: state middleware (state via options)', () => {
+  test("example: state middleware (state via options)", () => {
     const createState = () => {
       let state = {}
 
       return [
         () => state,
-        updatedState => {
+        (updatedState) => {
           state = updatedState
           return state
         },
       ]
     }
 
-    const middleware = (_, { state }) => next => (action, ...args) => {
-      if (action.type === 'GET') {
+    const middleware = (_, { state }) => (next) => (action, ...args) => {
+      if (action.type === "GET") {
         return state.get()
-      } else if (action.type === 'SET') {
+      } else if (action.type === "SET") {
         return state.set(action.payload)
       } else {
         return next(action, ...args)
@@ -139,17 +139,17 @@ describe('dynamicMiddleware', () => {
 
     const dispatch = dynamicMiddleware(options, middleware)
 
-    expect(dispatch({ type: 'GET' })).toEqual(get())
-    expect(dispatch({ type: 'SET', payload: { testing: [1, 2] } })).toEqual(
-      get(),
+    expect(dispatch({ type: "GET" })).toEqual(get())
+    expect(dispatch({ type: "SET", payload: { testing: [1, 2] } })).toEqual(
+      get()
     )
-    expect(dispatch({ type: 'GET' })).toEqual(get())
-    expect(dispatch({ type: 'UNKNOWN' })).toEqual([{ type: 'UNKNOWN' }])
+    expect(dispatch({ type: "GET" })).toEqual(get())
+    expect(dispatch({ type: "UNKNOWN" })).toEqual([{ type: "UNKNOWN" }])
   })
 
-  test('adding/removing middleware', () => {
-    const a = jest.fn(() => next => action => next(action))
-    const b = jest.fn(() => next => action => next(action))
+  test("adding/removing middleware", () => {
+    const a = jest.fn(() => (next) => (action) => next(action))
+    const b = jest.fn(() => (next) => (action) => next(action))
 
     const dispatch = dynamicMiddleware()
 
@@ -173,8 +173,8 @@ describe('dynamicMiddleware', () => {
   })
 })
 
-describe('bridge', () => {
-  test('bridging dispatchers', () => {
+describe("bridge", () => {
+  test("bridging dispatchers", () => {
     const dispatch = staticMiddleware(bridge(staticMiddleware()))
 
     expect(dispatch(1, 2, 3)).toEqual([[1, 2, 3]])

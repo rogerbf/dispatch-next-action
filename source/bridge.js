@@ -1,11 +1,11 @@
-export default dispatch => {
-  if (typeof dispatch !== 'function') {
+export default (dispatch) => {
+  if (typeof dispatch !== "function") {
     throw new TypeError(
       `Expected [object Function], got ${Object.prototype.toString.call(
-        dispatch,
-      )}`,
+        dispatch
+      )}`
     )
   }
 
-  return () => next => (...args) => next(dispatch(...args))
+  return () => (next) => (...args) => next(dispatch(...args))
 }
